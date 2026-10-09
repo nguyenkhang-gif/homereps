@@ -1,7 +1,7 @@
 # Kế hoạch tập toàn thân tại nhà
 
 **Người tập:** mới bắt đầu · 65–66 kg · 1m67 (BMI ≈ 23,7)
-**Thời gian:** 30–45 phút/buổi · 4–5 buổi/tuần · không cần dụng cụ (chỉ cần 1 ghế chắc chắn và 1 bức tường)
+**Thời gian:** khoảng 30 phút/buổi (đã gồm khởi động và giãn cơ) · 4–5 buổi/tuần · không cần dụng cụ (chỉ cần 1 ghế chắc chắn và 1 bức tường)
 
 ---
 
@@ -13,22 +13,23 @@
 
 - Tập 4 buổi (T2, T3, T5, T6) là đủ. Thêm T7 nếu còn sức.
 - Bận vài ngày? Trong mục **Ngày tập** của `index.html`: chọn *Bận* cho ngày đó, app tự dồn các buổi còn thiếu sang ngày trống còn lại trong tuần để vẫn đủ mục tiêu (mặc định 4 buổi/tuần). Lịch mặc định cũng đổi được ở đó.
-- Mỗi buổi: **khởi động 5′ → bài chính → giãn cơ 5′**.
-- Ký hiệu: `3 × 10` = 3 hiệp, mỗi hiệp 10 lần. `/bên` = mỗi bên trái/phải.
+- Mỗi buổi: **khởi động ~4′ → bài chính ~20′ → giãn cơ ~4′**.
+- Ký hiệu: `3 × 10` = làm 3 lần (3 vòng hoặc 3 lượt), mỗi lần 10 cái. `/bên` = mỗi bên trái/phải.
+- Mỗi buổi đều có đủ **chân, đẩy, lưng và core**. Không lặp cùng một bài ở hai ngày tập liền nhau, và hai bài liền nhau trong buổi không dùng chung nhóm cơ, để nhóm cơ vừa tập được nghỉ trong lúc tập nhóm khác.
 
 ## Lên cấp khi nào?
 
-| Cấp | Thời gian | Hiệp | Nghỉ giữa hiệp | Điều kiện lên cấp |
+| Cấp | Thời gian | Cách tập | Nghỉ | Điều kiện lên cấp |
 |---|---|---|---|---|
-| **Cơ bản** | Tuần 1–4 | 3 | 60 giây | Làm đủ mọi hiệp đúng form 2 tuần liền, plank được 40 giây |
-| **Trung bình** | Tuần 5–8 | 3–4 | 45 giây | Chống đẩy thường 15 cái liên tục, squat 25 cái |
-| **Nâng cao** | Tuần 9+ | 4–5 | 30 giây | Duy trì, tăng rep hoặc giảm nghỉ |
+| **Cơ bản** | Tuần 1–4 | Theo vòng, 3 vòng | 15s chuyển bài · 75s giữa vòng | Làm đủ mọi vòng đúng form 2 tuần liền, plank được 40 giây |
+| **Trung bình** | Tuần 5–8 | Ghép cặp, 3 lượt | 15s chuyển bài · 45s sau mỗi lượt | Chống đẩy thường 15 cái liên tục, squat 25 cái |
+| **Nâng cao** | Tuần 9+ | Ghép cặp, 3–4 lượt | 15s chuyển bài · 30s sau mỗi lượt | Duy trì, tăng rep hoặc giảm nghỉ |
 
 Mỗi tuần trong cùng cấp: **+1–2 rep mỗi hiệp** hoặc **+5 giây** cho bài giữ tư thế.
 
 ---
 
-## Khởi động (5 phút, mọi cấp)
+## Khởi động (~4 phút, mọi cấp)
 
 1. Bật nhảy dang tay chân: 45 giây
 2. Xoay vai, hông, cổ tay: 1 phút
@@ -36,7 +37,7 @@ Mỗi tuần trong cùng cấp: **+1–2 rep mỗi hiệp** hoặc **+5 giây** 
 4. Squat nhẹ: 10 cái
 5. Chống đẩy quỳ: 5 cái
 
-## Giãn cơ (5 phút, mọi cấp)
+## Giãn cơ (~4 phút, mọi cấp)
 
 1. Tư thế em bé: 30 giây
 2. Kéo giãn đùi sau: 20 giây/bên
@@ -46,115 +47,184 @@ Mỗi tuần trong cùng cấp: **+1–2 rep mỗi hiệp** hoặc **+5 giây** 
 
 ---
 
-## Cấp 1: Cơ bản (tuần 1–4) · nghỉ 60 giây
+## Cấp 1: Cơ bản (tuần 1–4)
 
-### Ngày 1 (T2): Toàn thân A · ~35 phút
+**Cách tập: theo vòng.** Làm lần lượt mọi bài trong bảng là xong 1 vòng (chuyển bài 15 giây), hết vòng nghỉ 75 giây. Làm 3 vòng.
+
+### T2: Toàn thân A · ~28 phút
+
 | # | Bài | Số lượng | Nhóm cơ |
 |---|---|---|---|
-| 1 | Squat | 3 × 10 | Đùi trước, mông |
-| 2 | Chống đẩy quỳ gối | 3 × 8 | Ngực, vai, tay sau |
-| 3 | Nâng hông (Glute Bridge) | 3 × 12 | Mông, đùi sau |
-| 4 | Chó chim (Bird Dog) | 3 × 6/bên | Core, lưng dưới |
-| 5 | Plank cẳng tay | 3 × 20 giây | Core |
-| 6 | Đi bộ nâng gối | 3 × 40 bước | Tim mạch |
+| 1 | Squat | 3 × 15 | Đùi trước · Mông |
+| 2 | Chống đẩy quỳ gối | 3 × 10 | Ngực · Vai trước · Tay sau |
+| 3 | Nâng hông | 3 × 15 | Mông · Đùi sau |
+| 4 | Thiên thần tuyết ngược | 3 × 10 | Lưng trên · Vai sau · Bả vai |
+| 5 | Plank cẳng tay | 3 × 30 giây | Core · Vai |
+| 6 | Chó chim | 3 × 6/bên | Core · Lưng dưới · Mông |
+| 7 | Bật nhảy dang tay chân | 3 × 40 | Tim mạch · Toàn thân |
 
-### Ngày 2 (T3): Toàn thân B · ~35 phút
+### T3: Toàn thân B · ~29 phút
+
 | # | Bài | Số lượng | Nhóm cơ |
 |---|---|---|---|
-| 1 | Bước lùi chùng chân (Reverse Lunge) | 3 × 6/bên | Đùi, mông |
-| 2 | Siêu nhân (Superman) | 3 × 10 | Lưng dưới, mông |
-| 3 | Ngồi dựa tường (Wall Sit) | 3 × 20 giây | Đùi trước |
-| 4 | Bọ chết (Dead Bug) | 3 × 6/bên | Core sâu |
-| 5 | Nhón bắp chân | 3 × 15 | Bắp chân |
-| 6 | Bật nhảy dang tay chân | 3 × 20 | Tim mạch |
+| 1 | Bước lùi chùng chân | 3 × 8/bên | Đùi · Mông |
+| 2 | Chống đẩy tay lên ghế | 3 × 10 | Ngực · Vai trước · Tay sau |
+| 3 | Siêu nhân | 3 × 12 | Lưng dưới · Mông · Vai sau |
+| 4 | Bọ chết | 3 × 8/bên | Core sâu |
+| 5 | Nhón bắp chân | 3 × 20 | Bắp chân |
+| 6 | Plank nghiêng | 3 × 15 giây/bên | Bụng chéo · Hông |
+| 7 | Đi bộ nâng gối tại chỗ | 3 × 40 | Tim mạch · Hông |
 
-### Ngày 3 (T5): Toàn thân C · ~37 phút
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Squat | 3 × 12 |
-| 2 | Chống đẩy quỳ gối | 3 × 10 |
-| 3 | Nâng hông | 3 × 15 |
-| 4 | Gập bụng (Crunch) | 3 × 12 |
-| 5 | Plank cẳng tay | 3 × 25 giây |
-| 6 | Bật nhảy dang tay chân | 3 × 25 |
+### T5: Toàn thân C · ~28 phút
 
-### Ngày 4 (T6): Toàn thân D · ~38 phút
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Bước lùi chùng chân | 3 × 8/bên |
-| 2 | Siêu nhân | 3 × 12 |
-| 3 | Ngồi dựa tường | 3 × 30 giây |
-| 4 | Bọ chết | 3 × 8/bên |
-| 5 | Nhón bắp chân | 3 × 20 |
-| 6 | Đi bộ nâng gối | 3 × 60 bước |
+| # | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| 1 | Ngồi dựa tường | 3 × 30 giây | Đùi trước |
+| 2 | Chống đẩy quỳ gối | 3 × 10 | Ngực · Vai trước · Tay sau |
+| 3 | Nâng hông một chân | 3 × 8/bên | Mông · Đùi sau |
+| 4 | Chó chim | 3 × 6/bên | Core · Lưng dưới · Mông |
+| 5 | Gập bụng | 3 × 15 | Bụng trên |
+| 6 | Siêu nhân | 3 × 10 | Lưng dưới · Mông · Vai sau |
+| 7 | Bật nhảy dang tay chân | 3 × 40 | Tim mạch · Toàn thân |
 
-### Ngày 5 (T7, tuỳ chọn): Cardio nhẹ + Core
-Bật nhảy dang tay chân 3 × 30 · Đi bộ nâng gối 3 × 60 · Gập bụng 3 × 15 · Chó chim 3 × 8/bên · Plank 3 × 30 giây
+### T6: Toàn thân D · ~27 phút
+
+| # | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| 1 | Squat | 3 × 15 | Đùi trước · Mông |
+| 2 | Chống đẩy tay lên ghế | 3 × 12 | Ngực · Vai trước · Tay sau |
+| 3 | Nâng hông | 3 × 15 | Mông · Đùi sau |
+| 4 | Plank chạm vai | 3 × 16 | Core · Vai · Chống xoay |
+| 5 | Thiên thần tuyết ngược | 3 × 10 | Lưng trên · Vai sau · Bả vai |
+| 6 | Plank nghiêng | 3 × 15 giây/bên | Bụng chéo · Hông |
+| 7 | Đi bộ nâng gối tại chỗ | 3 × 40 | Tim mạch · Hông |
+
+### T7: Cardio nhẹ + Core (tuỳ chọn) · ~20 phút
+
+| # | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| 1 | Chạy nâng cao đùi | 3 × 30 | Tim mạch · Bụng dưới |
+| 2 | Bọ chết | 3 × 8/bên | Core sâu |
+| 3 | Nhón bắp chân | 3 × 20 | Bắp chân |
+| 4 | Plank cẳng tay | 3 × 30 giây | Core · Vai |
 
 ---
 
-## Cấp 2: Trung bình (tuần 5–8) · nghỉ 45 giây
+## Cấp 2: Trung bình (tuần 5–8)
 
-### Ngày 1: Đẩy + Chân
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Squat | 4 × 15 |
-| 2 | Chống đẩy | 4 × 10 |
-| 3 | Bước lùi chùng chân | 3 × 10/bên |
-| 4 | Chống đẩy chữ V ngược (Pike Push-up) | 3 × 8 |
-| 5 | Plank cẳng tay | 3 × 45 giây |
-| 6 | Đạp xe gập bụng (Bicycle Crunch) | 3 × 16 |
+**Cách tập: ghép cặp.** Làm xen kẽ 2 bài cùng chữ cái (A1 → A2 → A1 …, chuyển bài 15 giây), sau mỗi lượt nghỉ 45 giây. Xong cặp A mới sang cặp B.
 
-### Ngày 2: Lưng + Mông
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Nâng hông một chân | 3 × 10/bên |
-| 2 | Nhún tay sau trên ghế (Chair Dip) | 3 × 10 |
-| 3 | Siêu nhân | 3 × 15 |
-| 4 | Ngồi dựa tường | 3 × 45 giây |
-| 5 | Nâng chân (Leg Raise) | 3 × 12 |
-| 6 | Plank nghiêng | 3 × 25 giây/bên |
+### T2: Chân + Đẩy · ~29 phút
 
-### Ngày 3: Toàn thân HIIT
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Burpee bước lùi (Squat Thrust) | 4 × 10 |
-| 2 | Leo núi (Mountain Climber) | 4 × 30 |
-| 3 | Chạy nâng cao đùi | 4 × 40 |
-| 4 | Chống đẩy | 3 × 12 |
-| 5 | Xoay người kiểu Nga (Russian Twist) | 3 × 20 |
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat | 3 × 20 | Đùi trước · Mông |
+| A2 | Chống đẩy | 3 × 12 | Ngực · Vai trước · Tay sau · Core |
+| B1 | Bước lùi chùng chân | 3 × 12/bên | Đùi · Mông |
+| B2 | Thiên thần tuyết ngược | 3 × 12 | Lưng trên · Vai sau · Bả vai |
+| C1 | Đạp xe gập bụng | 3 × 20 | Bụng chéo · Bụng trên |
+| C2 | Chạy nâng cao đùi | 3 × 50 | Tim mạch · Bụng dưới |
 
-### Ngày 4: Đẩy + Chân 2
-Chống đẩy 4 × 12 · Squat 4 × 18 · Pike Push-up 3 × 10 · Nâng hông 3 × 20 · Nhón bắp chân 3 × 25 · Đá chân luân phiên 3 × 30 giây
+### T3: Mông + Vai · ~31 phút
 
-### Ngày 5 (tuỳ chọn): Core + Cardio
-Leo núi 3 × 40 · Chạy nâng cao đùi 3 × 40 · Đạp xe gập bụng 3 × 20 · Nâng chân 3 × 12 · Plank 3 × 60 giây
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Nâng hông một chân | 3 × 10/bên | Mông · Đùi sau |
+| A2 | Chống đẩy chữ V ngược | 3 × 8 | Vai · Tay sau |
+| B1 | Nhón bắp chân | 3 × 25 | Bắp chân |
+| B2 | Chó chim | 3 × 8/bên | Core · Lưng dưới · Mông |
+| C1 | Plank nghiêng | 3 × 20 giây/bên | Bụng chéo · Hông |
+| C2 | Bật nhảy dang tay chân | 3 × 50 | Tim mạch · Toàn thân |
+
+### T5: Đùi + Tay sau · ~28 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Ngồi dựa tường | 3 × 45 giây | Đùi trước |
+| A2 | Nhún tay sau trên ghế | 3 × 12 | Tay sau · Vai trước |
+| B1 | Nâng hông | 3 × 20 | Mông · Đùi sau |
+| B2 | Siêu nhân | 3 × 15 | Lưng dưới · Mông · Vai sau |
+| C1 | Nâng chân | 3 × 12 | Bụng dưới · Gập hông |
+| C2 | Burpee bước lùi | 3 × 10 | Toàn thân |
+
+### T6: Chân + Đẩy 2 · ~28 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat | 3 × 22 | Đùi trước · Mông |
+| A2 | Chống đẩy | 3 × 12 | Ngực · Vai trước · Tay sau · Core |
+| B1 | Nâng hông một chân | 3 × 12/bên | Mông · Đùi sau |
+| B2 | Thiên thần tuyết ngược | 3 × 12 | Lưng trên · Vai sau · Bả vai |
+| C1 | Xoay người kiểu Nga | 3 × 24 | Bụng chéo |
+| C2 | Leo núi | 3 × 40 | Core · Vai · Tim mạch |
+
+### T7: Core + Cardio (tuỳ chọn) · ~23 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Đá chân luân phiên | 3 × 30 giây | Bụng dưới |
+| A2 | Bật nhảy dang tay chân | 3 × 50 | Tim mạch · Toàn thân |
+| B1 | Plank cẳng tay | 3 × 60 giây | Core · Vai |
+| B2 | Chạy nâng cao đùi | 3 × 40 | Tim mạch · Bụng dưới |
 
 ---
 
-## Cấp 3: Nâng cao (tuần 9+) · nghỉ 30 giây
+## Cấp 3: Nâng cao (tuần 9+)
 
-### Ngày 1: Sức mạnh toàn thân
-| # | Bài | Số lượng |
-|---|---|---|
-| 1 | Squat bật nhảy | 4 × 15 |
-| 2 | Chống đẩy chân cao (Decline) | 4 × 12 |
-| 3 | Squat chùng chân gác ghế (Bulgarian) | 4 × 10/bên |
-| 4 | Chống đẩy kim cương | 3 × 12 |
-| 5 | Gập người chữ V (V-up) | 3 × 12 |
-| 6 | Giữ thân thuyền (Hollow Hold) | 3 × 30 giây |
+**Cách tập: ghép cặp.** Làm xen kẽ 2 bài cùng chữ cái (A1 → A2 → A1 …, chuyển bài 15 giây), sau mỗi lượt nghỉ 30 giây. Xong cặp A mới sang cặp B.
 
-### Ngày 2: Vai + Mông
-Burpee 4 × 10 · Pike Push-up 4 × 10 · Nâng hông một chân 4 × 15/bên · Chair Dip 4 × 15 · Plank nghiêng 3 × 45 giây/bên · Đá chân luân phiên 3 × 45 giây
+### T2: Sức mạnh toàn thân · ~30 phút
 
-### Ngày 3: HIIT cường độ cao
-Burpee 4 × 12 · Squat bật nhảy 4 × 15 · Leo núi 4 × 50 · Chống đẩy 4 × 20 · Chạy nâng cao đùi 4 × 60 · Russian Twist 3 × 30
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat bật nhảy | 4 × 12 | Đùi · Mông · Sức bật |
+| A2 | Chống đẩy chân cao | 4 × 12 | Ngực trên · Vai |
+| B1 | Squat chùng chân gác ghế | 4 × 10/bên | Đùi · Mông |
+| B2 | Thiên thần tuyết ngược | 4 × 15 | Lưng trên · Vai sau · Bả vai |
+| C1 | Gập người chữ V | 3 × 12 | Bụng trên · Bụng dưới |
+| C2 | Burpee | 3 × 10 | Toàn thân · Tim mạch |
 
-### Ngày 4: Chân + Đẩy
-Bulgarian 4 × 12/bên · Decline Push-up 4 × 15 · Ngồi dựa tường 3 × 60 giây · Siêu nhân 3 × 20 · V-up 3 × 15 · Nâng chân 3 × 15
+### T3: Vai + Mông · ~30 phút
 
-### Ngày 5 (tuỳ chọn): Finisher
-Burpee 5 × 12 · Leo núi 4 × 60 · Squat bật nhảy 4 × 15 · Hollow Hold 3 × 40 giây · Plank 3 × 90 giây
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Nâng hông một chân | 4 × 12/bên | Mông · Đùi sau |
+| A2 | Chống đẩy chữ V ngược | 4 × 10 | Vai · Tay sau |
+| B1 | Nhón bắp chân | 3 × 25 | Bắp chân |
+| B2 | Chó chim | 3 × 10/bên | Core · Lưng dưới · Mông |
+| C1 | Giữ thân thuyền | 3 × 30 giây | Core |
+| C2 | Leo núi | 4 × 50 | Core · Vai · Tim mạch |
+
+### T5: Đùi + Tay sau · ~31 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat | 4 × 25 | Đùi trước · Mông |
+| A2 | Chống đẩy kim cương | 4 × 12 | Tay sau · Ngực trong |
+| B1 | Nâng hông | 3 × 20 | Mông · Đùi sau |
+| B2 | Siêu nhân | 3 × 15 | Lưng dưới · Mông · Vai sau |
+| C1 | Plank nghiêng | 3 × 30 giây/bên | Bụng chéo · Hông |
+| C2 | Chạy nâng cao đùi | 3 × 50 | Tim mạch · Bụng dưới |
+
+### T6: Chân đơn + Đẩy · ~31 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat chùng chân gác ghế | 4 × 10/bên | Đùi · Mông |
+| A2 | Chống đẩy chân cao | 4 × 15 | Ngực trên · Vai |
+| B1 | Ngồi dựa tường | 3 × 60 giây | Đùi trước |
+| B2 | Thiên thần tuyết ngược | 3 × 15 | Lưng trên · Vai sau · Bả vai |
+| C1 | Nâng chân | 3 × 15 | Bụng dưới · Gập hông |
+| C2 | Burpee | 3 × 10 | Toàn thân · Tim mạch |
+
+### T7: Finisher (tuỳ chọn) · ~22 phút
+
+| Cặp | Bài | Số lượng | Nhóm cơ |
+|---|---|---|---|
+| A1 | Squat bật nhảy | 4 × 15 | Đùi · Mông · Sức bật |
+| A2 | Plank chạm vai | 3 × 30 | Core · Vai · Chống xoay |
+| B1 | Giữ thân thuyền | 3 × 40 giây | Core |
+| B2 | Leo núi | 4 × 60 | Core · Vai · Tim mạch |
 
 ---
 

@@ -193,6 +193,15 @@ const EXERCISES = (function () {
       tip: 'Ghế càng cao càng khó. Bắt đầu với bậc thấp.',
       anim: { keys: pushKeys(40, 67, 60, 82, 110, 2), reps: 1, props: [{ box: [16, 70, 44] }] }
     },
+    incline: {
+      group: 'push', vi: 'Chống đẩy tay lên ghế', en: 'Incline Push-up', m: 'Ngực · Vai trước · Tay sau', sec: 2.5, dose: [10, 'r'],
+      steps: ['Đặt hai tay lên mép ghế chắc chắn hoặc mép giường, rộng hơn vai một chút.', 'Lùi chân ra sau để người thẳng từ gót tới đầu.', 'Hạ ngực chạm gần mép ghế rồi đẩy lên.'],
+      tip: 'Ghế càng thấp càng khó. Dễ hơn chống đẩy quỳ ở chỗ người vẫn giữ thẳng toàn thân.',
+      anim: (function () {
+        const T = prone(30, 121, 60, 55), B = prone(30, 121, 60, 80), hands = [[T.sh[0] + 2, 95], [T.sh[0] + 2, 95]];
+        return { keys: [[P(T.h, T.t, hands, [[30, 121], [30, 121]]), .9, .25], [P(B.h, B.t, hands, [[30, 121], [30, 121]]), .8, .1]], reps: 1, props: [{ box: [94, 97, 44] }] };
+      })()
+    },
     dip: {
       group: 'push', vi: 'Nhún tay sau trên ghế', en: 'Chair Dip', m: 'Tay sau · Vai trước', sec: 2.5, dose: [10, 'r'],
       steps: ['Ngồi mép ghế chắc chắn, tay nắm mép ghế sát hông.', 'Đẩy mông ra khỏi ghế, gập khuỷu tay hạ người đến khi cánh tay song song sàn.', 'Đẩy lên đến khi tay thẳng.'],
@@ -212,6 +221,15 @@ const EXERCISES = (function () {
         [P([90, 123], -1, [[172, 124], [172, 124]], [[30, 123], [30, 123]]), .9, .1],
         [P([90, 122], -11, [[170, 103], [170, 103]], [[32, 110], [32, 110]], { n: -6 }), .7, .9]
       ], reps: 1 }
+    },
+    snowangel: {
+      group: 'back', vi: 'Thiên thần tuyết ngược', en: 'Reverse Snow Angel', m: 'Lưng trên · Vai sau · Bả vai', sec: 3, dose: [10, 'r'],
+      steps: ['Nằm sấp, trán gần sàn, hai tay duỗi thẳng qua đầu, nhấc tay khỏi sàn.', 'Giữ tay cao khỏi sàn, quét hai tay vòng sang hai bên xuống sát hông.', 'Siết hai bả vai lại, rồi quét tay ngược lên qua đầu. Đó là 1 lần.'],
+      tip: 'Tay không chạm sàn suốt bài. Đi chậm, cảm nhận cơ giữa hai bả vai.',
+      anim: (function () {
+        const sa = (hand) => P([90, 123], -6, [hand, hand], [[30, 123], [30, 123]], { n: -4 });
+        return { keys: [[sa([168, 112]), .8, .2], [sa([136, 100]), .6, 0], [sa([84, 112]), .7, .4], [sa([136, 100]), .6, 0]], reps: 1 };
+      })()
     },
     birddog: {
       group: 'back', vi: 'Chó chim', en: 'Bird Dog', m: 'Core · Lưng dưới · Mông', sec: 2.5, dose: [6, 'b'],
@@ -337,6 +355,16 @@ const EXERCISES = (function () {
       steps: ['Chạy tại chỗ trên mũi chân.', 'Đùi nâng ngang hông mỗi bước.', 'Tay đánh mạnh theo nhịp chân.'],
       tip: 'Giữ lưng thẳng, mắt nhìn trước. Mệt thì giảm tốc độ, đừng gù lưng.',
       anim: { keys: knees(true, 64, .17), reps: 2 }
+    },
+    shouldertap: {
+      group: 'core', vi: 'Plank chạm vai', en: 'Plank Shoulder Tap', m: 'Core · Vai · Chống xoay', sec: 1.5, dose: [20, 'r'],
+      steps: ['Tư thế chống đẩy cao, chân rộng hơn hông để dễ giữ thăng bằng.', 'Nhấc một tay chạm vai đối diện, giữ hông không lắc.', 'Đặt tay xuống, đổi tay. Mỗi lần chạm tính 1 rep.'],
+      tip: 'Hông đứng yên như có ly nước đặt trên lưng. Khó quá thì hạ gối xuống sàn.',
+      anim: (function () {
+        const T = prone(40, 119, 60, 82), down = [T.sh[0], 124], tap = [T.sh[0] - 6, T.sh[1] + 6];
+        const st = (a, b) => P(T.h, T.t, [a, b], [[40, 119], [40, 119]]);
+        return { keys: [[st(down, down), .35, .05], [st(tap, down), .35, .15], [st(down, down), .35, .05], [st(down, tap), .35, .15]], reps: 2 };
+      })()
     },
     mountain: {
       group: 'cardio', vi: 'Leo núi', en: 'Mountain Climber', m: 'Core · Vai · Tim mạch', sec: .5, dose: [30, 'r'],
