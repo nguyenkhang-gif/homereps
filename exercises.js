@@ -26,7 +26,8 @@ const EXERCISE_GROUPS = [
   { id: 'push', vi: 'Đẩy · Ngực · Vai' },
   { id: 'back', vi: 'Lưng' },
   { id: 'core', vi: 'Core · Bụng' },
-  { id: 'cardio', vi: 'Tim mạch' }
+  { id: 'cardio', vi: 'Tim mạch' },
+  { id: 'stretch', vi: 'Khởi động · Giãn cơ' }
 ];
 
 const EXERCISES = (function () {
@@ -354,6 +355,64 @@ const EXERCISES = (function () {
       steps: ['Ngồi xuống, tay chạm sàn.', 'Bật chân ra sau, chống đẩy 1 cái.', 'Bật chân về, bật nhảy lên và vỗ tay qua đầu.'],
       tip: 'Giữ form đúng quan trọng hơn tốc độ. Hít thở ở đỉnh mỗi rep.',
       anim: { keys: [[bStand, .45, .05], [bSquat, .3, 0], [bPlank, .45, 0], [bLow, .45, 0], [bPlank, .3, 0], [bSquat, .35, 0], [bAir, .35, 0]], reps: 1 }
+    },
+
+    /* ===== Khởi động · Giãn cơ ===== */
+    armcircles: {
+      group: 'stretch', vi: 'Xoay vai, hông, cổ tay', en: 'Arm & Joint Circles', m: 'Vai · Hông · Cổ tay', sec: 1, dose: [60, 's'],
+      steps: ['Đứng thẳng, dang tay, xoay vòng tay to từ trước ra sau 15 vòng rồi đổi chiều.', 'Hai tay chống hông, xoay hông 10 vòng mỗi chiều.', 'Đan hai tay, xoay cổ tay và cổ chân mỗi bên 10 vòng.'],
+      tip: 'Xoay chậm, biên độ tăng dần. Không gập mạnh cổ.',
+      anim: (function () {
+        const sh = [100, 26], r = 43, at = (deg) => [sh[0] + r * Math.cos(deg * D2R), sh[1] + r * Math.sin(deg * D2R)];
+        const keys = [];
+        for (let k = 0; k < 16; k++) { const h = at(90 - k * 22.5); keys.push([P([100, 66], -90, [h, h], [[101, 125], [99, 125]]), .1, 0]); }
+        return { keys, reps: 1 };
+      })()
+    },
+    childpose: {
+      group: 'stretch', vi: 'Tư thế em bé', en: "Child's Pose", m: 'Lưng · Hông · Vai', sec: 1, dose: [30, 's'],
+      steps: ['Quỳ gối, ngón chân cái chạm nhau, gối rộng bằng hông.', 'Ngồi lùi mông về phía gót chân, cúi người về trước.', 'Duỗi tay ra trước, trán chạm sàn, thở chậm và sâu.'],
+      tip: 'Thả lỏng vai và cổ. Khó ngồi sát gót thì kê gối dưới mông.',
+      anim: (function () {
+        const cp = (hy, t) => P([46, hy], t, [[124, 123], [124, 123]], [[40, 123], [40, 123]], { n: 18, fp: [90, 90] });
+        return { keys: [[cp(104, 17.5), 1.8, .8], [cp(101, 14), 1.8, .8]], hold: true };
+      })()
+    },
+    hamstring: {
+      group: 'stretch', vi: 'Kéo giãn đùi sau', en: 'Seated Hamstring Stretch', m: 'Đùi sau · Lưng dưới', sec: 1, dose: [20, 'sb'],
+      steps: ['Ngồi trên sàn, duỗi thẳng một chân, chân kia co lại, bàn chân áp vào đùi trong.', 'Giữ lưng thẳng, gập người từ hông về phía mũi chân duỗi.', 'Dừng ở chỗ thấy căng vừa phải, giữ và thở đều. Hết giờ đổi bên.'],
+      tip: 'Gập từ hông, không cong gù lưng. Không nhún nảy.',
+      anim: (function () {
+        const hs = (t, hand) => P([66, 121], t, [hand, hand], [[127, 121], [127, 121]], { n: t > -60 ? 14 : 0, fp: [0, 0] });
+        return { keys: [[hs(-88, [92, 112]), 1.4, .4], [hs(-34, [126, 110]), 1.6, 2.2]], hold: true };
+      })()
+    },
+    quadstretch: {
+      group: 'stretch', vi: 'Kéo giãn đùi trước', en: 'Standing Quad Stretch', m: 'Đùi trước · Gập hông', sec: 1, dose: [20, 'sb'],
+      steps: ['Đứng thẳng, một tay vịn tường hoặc ghế.', 'Co một chân ra sau, tay cùng bên nắm cổ chân, kéo gót về phía mông.', 'Hai gối sát nhau, đẩy hông nhẹ về trước. Hết giờ đổi bên.'],
+      tip: 'Không ưỡn lưng. Gối của chân co chỉ thẳng xuống sàn.',
+      anim: (function () {
+        const qs = (hx, ank) => P([hx, 66], -90, [ank, [134, 52]], [ank, [hx + 1, 125]], { fp: [60, 0] });
+        return { keys: [[qs(100, [89, 70]), 1.6, .6], [qs(102, [88, 64]), 1.6, 1.2]], hold: true, props: [{ wall: 146 }] };
+      })()
+    },
+    chestdoor: {
+      group: 'stretch', vi: 'Mở ngực ở khung cửa', en: 'Doorway Chest Stretch', m: 'Ngực · Vai trước', sec: 1, dose: [30, 's'],
+      steps: ['Đứng giữa khung cửa, hai tay bám hai bên khung ngang vai.', 'Bước một chân lên trước, dồn người qua khung cửa.', 'Dừng khi thấy căng ở ngực và vai trước, giữ và thở đều.'],
+      tip: 'Vai hạ thấp, không nhún vai lên tai. Chỉ căng vừa, không đau.',
+      anim: (function () {
+        const cd = (hx, t) => P([hx, 67], t, [[56, 30], [56, 30]], [[hx + 14, 125], [hx - 10, 125]], { n: 4 });
+        return { keys: [[cd(92, -90), 1.6, .5], [cd(96, -84), 1.6, 1.6]], hold: true, props: [{ wall: 56 }] };
+      })()
+    },
+    breathing: {
+      group: 'stretch', vi: 'Thở sâu', en: 'Deep Breathing', m: 'Thả lỏng · Hạ nhịp tim', sec: 1, dose: [60, 's'],
+      steps: ['Ngồi quỳ trên gót (hoặc ngồi xếp bằng), lưng thẳng, thả lỏng vai.', 'Hít vào bằng mũi 4 giây, đưa tay lên cao.', 'Thở ra bằng miệng 6 giây, hạ tay xuống. Lặp lại.'],
+      tip: 'Thở bằng bụng: bụng phồng khi hít vào, xẹp khi thở ra.',
+      anim: (function () {
+        const br = (hands, hy) => P([60, hy], -90, hands, [[54, 123], [52, 123]], { fp: [90, 90] });
+        return { keys: [[br([[78, 106], [76, 106]], 106), 3.2, .6], [br([[64, 25], [62, 25]], 104), 2.2, .8]], hold: true };
+      })()
     }
   };
 })();

@@ -109,6 +109,13 @@ header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: 
 .phase { padding: 12px 18px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--line); background: var(--panel-2); font-size: .84rem; }
 .phase .lab { font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 700; color: var(--ink-2); min-width: 78px; }
 .phase .items { color: var(--ink-2); min-width: 0; flex: 1; }
+.phase.cards { display: grid; gap: 8px; }
+.ph-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.ph { flex: 0 0 136px; border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 6px; text-align: left; display: grid; gap: 3px; align-content: start; }
+.ph:hover { border-color: var(--accent); }
+.ph canvas { width: 100%; aspect-ratio: 200 / 150; background: var(--panel-2); border-radius: 7px; display: block; }
+.ph b { font-size: .78rem; line-height: 1.3; }
+.ph small { font-size: .72rem; color: var(--ink-2); }
 
 .ex { display: grid; grid-template-columns: 30px 168px minmax(0,1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: center; }
 .ex:last-of-type { border-bottom: 0; }
@@ -638,8 +645,13 @@ const LEVELS = [
       { n: 'Finisher', f: 'Buổi tuỳ chọn', opt: true, x: [['burpee', 5, 12, 'r'], ['mountain', 4, 60, 'r'], ['jumpsquat', 4, 15, 'r'], ['hollow', 3, 40, 's'], ['plank', 3, 90, 's']] }
     ] }
 ];
-const WARMUP = 'Bật nhảy dang tay chân 45s · Xoay vai, hông, cổ tay 1 phút · Đi bộ nâng gối 45s · Squat nhẹ 10 cái · Chống đẩy quỳ 5 cái';
-const COOLDOWN = 'Tư thế em bé 30s · Kéo giãn đùi sau 20s/bên · Kéo giãn đùi trước 20s/bên · Mở ngực vào khung cửa 30s · Thở sâu 1 phút';
+const WARMUP = [['jumpingjack', 45, 's'], ['armcircles', 60, 's'], ['march', 45, 's'], ['squat', 10, 'r'], ['kneepushup', 5, 'r']];
+const COOLDOWN = [['childpose', 30, 's'], ['hamstring', 20, 'sb'], ['quadstretch', 20, 'sb'], ['chestdoor', 30, 's'], ['breathing', 60, 's']];
+function doseText(amt, u) {
+  if (u === 's') return amt >= 60 && amt % 60 === 0 ? amt / 60 + ' phút' : amt + ' giây';
+  if (u === 'sb') return amt + ' giây/bên';
+  return amt + (u === 'b' ? ' lần/bên' : ' lần');
+}
 
 const UNIT = { r: 'rep', b: 'rep/bên', s: 'giây', sb: 'giây/bên' };
 const GROUPS = EXERCISE_GROUPS.map(g => [g.vi, Object.keys(X).filter(id => X[id].group === g.id)]);
@@ -779,7 +791,7 @@ function renderSession() {
       <span class="grow"></span>
       <span class="seg-l">Cường độ</span><span class="seg" role="group" aria-label="Cường độ">${INTENSITY.map((I, j) => `<button type="button" data-int="${j}" title="${I.d}" aria-pressed="${(state.intensity ?? 1) === j}">${I.k}</button>`).join('')}</span>
       <button class="btn" type="button" id="editBtn">✎ Chỉnh bài</button></div>`}
-    <div class="phase"><span class="lab">Khởi động 5′</span><span class="items">${WARMUP}</span></div>
+    <div class="phase cards"><span class="lab">Khởi động 5′</span><div class="ph-list">${WARMUP.map(([id, amt, u]) => `<button class="ph" type="button" data-guide="${id}" data-dose="${doseText(amt, u)}"><canvas></canvas><b>${esc(X[id].vi)}</b><small>${doseText(amt, u)}</small></button>`).join('')}</div></div>
     ${editMode ? editRows(d) : d.x.map((it, i) => {
       const [id, sets, amt, u] = it, info = X[id], have = entry?.sets?.[i] || 0;
       return `<div class="ex${have >= sets ? ' done' : ''}" data-i="${i}">
@@ -792,10 +804,11 @@ function renderSession() {
         </div>
       </div>`;
     }).join('')}
-    <div class="phase" style="border-top:1px solid var(--line);border-bottom:0"><span class="lab">Giãn cơ 5′</span><span class="items">${COOLDOWN}</span></div>`;
+    <div class="phase cards" style="border-top:1px solid var(--line);border-bottom:0"><span class="lab">Giãn cơ 5′</span><div class="ph-list">${COOLDOWN.map(([id, amt, u]) => `<button class="ph" type="button" data-guide="${id}" data-dose="${doseText(amt, u)}"><canvas></canvas><b>${esc(X[id].vi)}</b><small>${doseText(amt, u)}</small></button>`).join('')}</div></div>`;
   stages = [...$('session').querySelectorAll('.ex')].map((el, i) => ({
     canvas: el.querySelector('canvas'), cnt: el.querySelector('.cnt'), ex: E[d.x[i][0]], start: performance.now() / 1000 - i * .37
   }));
+  $('session').querySelectorAll('.ph canvas').forEach((cv, j) => stages.push({ canvas: cv, cnt: null, ex: E[cv.closest('.ph').dataset.guide], offset: j * .41 }));
   stages.forEach(sizeCanvas);
 }
 
@@ -971,20 +984,26 @@ $('session').addEventListener('click', e => {
     }
     return;
   }
+  const gd = e.target.closest('[data-guide]');
+  if (gd) { showGuide(gd.dataset.guide, esc(gd.dataset.dose)); return; }
   if (editMode) return;
   const op = e.target.closest('[data-open]');
   if (op) openDlg(+op.dataset.open);
 });
 
 function openDlg(i) {
-  const it = LV(state.level).days[selDay].x[i], info = X[it[0]];
+  const it = LV(state.level).days[selDay].x[i];
+  showGuide(it[0], `${it[1]} × ${it[2]}<small>${UNIT[it[3]]}</small>`);
+}
+function showGuide(id, doseHtml) {
+  const info = X[id];
   $('dlgName').textContent = info.vi;
   $('dlgMuscle').textContent = info.en + ' · ' + info.m;
-  $('dlgDose').innerHTML = `${it[1]} × ${it[2]}<small>${UNIT[it[3]]}</small>`;
+  $('dlgDose').innerHTML = doseHtml;
   $('dlgSteps').innerHTML = info.steps.map(s => `<li>${esc(s)}</li>`).join('');
   $('dlgTip').innerHTML = `<b>Lưu ý:</b> ${esc(info.tip)}`;
   $('dlg').showModal();
-  dlgStage = { canvas: $('dlgCanvas'), cnt: $('dlgCnt'), ex: E[it[0]] };
+  dlgStage = { canvas: $('dlgCanvas'), cnt: $('dlgCnt'), ex: E[id] };
   sizeCanvas(dlgStage);
 }
 $('dlgClose').onclick = () => $('dlg').close();
@@ -1507,14 +1526,14 @@ function buildSteps() {
   const L = LV(state.level), d = L.days[selDay], entry = currentEntry();
   const fresh = !entry || isDone(entry);
   const steps = [];
-  if (fresh || setsDone(entry) === 0) steps.push({ type: 'warm', sec: 300 });
+  if (fresh || setsDone(entry) === 0) WARMUP.forEach((w, j) => steps.push({ type: 'warm', w, j }));
   const sets = [];
   d.x.forEach((it, i) => { const have = fresh ? 0 : (entry.sets?.[i] || 0); for (let k = have; k < it[1]; k++) sets.push({ i, k }); });
   sets.forEach((st, n) => {
     steps.push({ type: 'set', i: st.i, k: st.k });
     if (n < sets.length - 1) steps.push({ type: 'rest', sec: sets[n + 1].i === st.i ? L.rest : Math.max(L.rest, 60), nextI: sets[n + 1].i, nextK: sets[n + 1].k });
   });
-  steps.push({ type: 'cool', sec: 300 });
+  COOLDOWN.forEach((w, j) => steps.push({ type: 'cool', w, j }));
   steps.push({ type: 'done' });
   return { steps, fresh };
 }
@@ -1531,9 +1550,10 @@ function startPlayer() {
 }
 function enterStep() {
   const st = pl.steps[pl.i], L = LV(state.level), d = L.days[selDay];
-  pl.paused = false; $('plPause').textContent = '⏸ Dừng'; plClock = 0;
-  const timed = st.type === 'warm' || st.type === 'cool' || st.type === 'rest' || (st.type === 'set' && setSec(d.x[st.i]) > 0);
-  pl.left = timed ? (st.type === 'set' ? setSec(d.x[st.i]) : st.sec) : 0;
+  pl.paused = false; $('plPause').textContent = '⏸ Dừng'; plClock = 0; pl.half = 0; pl.switched = false;
+  const phase = st.type === 'warm' || st.type === 'cool';
+  const timed = st.type === 'rest' || (phase && isTime(st.w[2])) || (st.type === 'set' && setSec(d.x[st.i]) > 0);
+  pl.left = !timed ? 0 : st.type === 'set' ? setSec(d.x[st.i]) : st.type === 'rest' ? st.sec : (st.w[2] === 'sb' ? st.w[1] * 2 : st.w[1]);
   pl.running = timed && st.type !== 'set';
   pl.end = Date.now() + pl.left * 1000;
   $('plSteps').innerHTML = pl.steps.slice(0, -1).map((x, j) => x.type === 'rest' ? '' : `<i class="${j < pl.i ? 'd' : j === pl.i ? 'c' : ''}"></i>`).join('');
@@ -1541,13 +1561,16 @@ function enterStep() {
   $('plStageBox').hidden = st.type === 'done';
   $('plNext').className = 'go';
   const exCount = d.x.length;
-  if (st.type === 'warm' || st.type === 'cool') {
-    plStage.ex = st.type === 'warm' ? E.jumpingjack : E.plank;
-    kind.textContent = st.type === 'warm' ? 'Khởi động' : 'Giãn cơ';
-    $('plName').textContent = st.type === 'warm' ? 'Làm nóng cơ thể' : 'Thả lỏng';
-    $('plSub').textContent = st.type === 'warm' ? WARMUP : COOLDOWN;
-    $('plWhere').textContent = st.type === 'warm' ? 'Bước đầu' : 'Bước cuối';
-    $('plNext').textContent = 'Bỏ qua ›';
+  if (phase) {
+    const [id, amt, u] = st.w, list = st.type === 'warm' ? WARMUP : COOLDOWN;
+    plStage.ex = E[id];
+    kind.textContent = `${st.type === 'warm' ? 'Khởi động' : 'Giãn cơ'} ${st.j + 1}/${list.length}`;
+    $('plName').textContent = X[id].vi;
+    $('plWhere').textContent = st.type === 'warm' ? 'Làm nóng cơ thể' : 'Thả lỏng sau buổi tập';
+    $('plSub').textContent = (u === 'sb' ? `Bên thứ nhất ${amt} giây, nghe bíp thì đổi bên. ` : '') + X[id].tip;
+    if (u === 'sb') pl.half = amt;
+    if (timed) $('plNext').textContent = 'Bỏ qua ›';
+    else { $('plBig').innerHTML = `${amt}<small>${UNIT[u]}</small>`; $('plNext').textContent = '✓ Xong ›'; $('plNext').className = 'go good'; }
   } else if (st.type === 'set') {
     const it = d.x[st.i], info = X[it[0]];
     plStage.ex = E[it[0]];
@@ -1581,7 +1604,12 @@ function plTick() {
   const st = pl.steps[pl.i]; if (!st || st.type === 'done') return;
   const d = LV(state.level).days[selDay];
   if (st.type === 'set' && !setSec(d.x[st.i])) return;
+  if ((st.type === 'warm' || st.type === 'cool') && !isTime(st.w[2])) return;
   if (pl.running && !pl.paused) pl.left = (pl.end - Date.now()) / 1000;
+  if (pl.half && !pl.switched && pl.running && !pl.paused && pl.left <= pl.half) {
+    pl.switched = true; beep(880, .25); setTimeout(() => beep(880, .25), 300);
+    $('plSub').textContent = 'Đổi bên! ' + X[st.w[0]].tip;
+  }
   $('plBig').textContent = fmt(pl.left);
   if (pl.running && !pl.paused && pl.left <= 3.2 && pl.left > 0 && Math.ceil(pl.left) !== pl.lastBeep) { pl.lastBeep = Math.ceil(pl.left); beep(660, .08); }
   if (pl.running && !pl.paused && pl.left <= 0) { pl.running = false; beep(990, .3); plAdvance(); }
