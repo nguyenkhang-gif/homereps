@@ -395,6 +395,19 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
 .w-list .up { color: var(--bad); } .w-list .down { color: var(--good); }
 .w-list button { border: 0; background: transparent; color: var(--ink-2); padding: 2px 6px; border-radius: 6px; }
 .w-list button:hover { color: var(--bad); background: var(--bad-soft); }
+
+.sw { display: flex; align-items: center; gap: 10px; font-size: .86rem; cursor: pointer; margin-top: 10px; }
+.sw input { width: 40px; height: 22px; appearance: none; -webkit-appearance: none; background: var(--line); border-radius: 99px; position: relative; cursor: pointer; flex: none; transition: background .15s; margin: 0; }
+.sw input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--panel); transition: transform .15s; }
+.sw input:checked { background: var(--good); }
+.sw input:checked::after { transform: translateX(18px); }
+.tts-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; margin-top: 12px; align-items: end; }
+.tts-grid select { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); height: 38px; padding: 0 8px; font-size: .85rem; width: 100%; min-width: 0; }
+.tts-grid input[type=range] { width: 100%; accent-color: var(--accent); height: 38px; }
+@media (max-width: 460px) { .tts-grid { grid-template-columns: minmax(0, 1fr); } }
+.pl-top #plVoice { display: grid; place-items: center; }
+.pl-top #plVoice svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pl-top #plVoice[aria-pressed="false"] { color: var(--ink-2); }
 </style>
 </head>
 <body>
@@ -469,6 +482,17 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
         <div class="cal" id="cal"></div>
         <div class="legend"><span><i style="background:var(--good)"></i>Hoàn thành</span><span><i style="background:var(--warn-soft);border:1px solid var(--warn)"></i>Tập dở</span><span><i style="background:var(--ink-2);opacity:.5;border-radius:50%"></i>Ngày tập</span></div>
         <div class="day-log" id="dayLog">Chọn một ngày để xem nhật ký.</div>
+      </section>
+
+      <section class="card on" data-pane="lich" id="ttsCard">
+        <h2>Giọng đọc hướng dẫn</h2>
+        <label class="sw" for="ttsOn"><input type="checkbox" id="ttsOn"> Đọc tên bài, số hiệp, thời gian nghỉ và đếm ngược khi tập</label>
+        <div class="tts-grid">
+          <label class="f" for="ttsVoice">Giọng<select id="ttsVoice"></select></label>
+          <label class="f" for="ttsRate"><span>Tốc độ <span id="ttsRateV" class="num"></span></span><input type="range" id="ttsRate" min="0.7" max="1.4" step="0.1"></label>
+        </div>
+        <div class="row"><button class="btn" type="button" id="ttsTest">▶ Nghe thử</button></div>
+        <p class="note" id="ttsNote"></p>
       </section>
 
       <section class="card on" data-pane="lich">
@@ -553,7 +577,7 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
 </dialog>
 <dialog id="player" aria-label="Buổi tập">
   <div class="pl">
-    <div class="pl-top"><span class="where num" id="plWhere"></span><button type="button" id="plClose" aria-label="Thoát">×</button></div>
+    <div class="pl-top"><span class="where num" id="plWhere"></span><button type="button" id="plVoice" aria-label="Giọng đọc" aria-pressed="true"></button><button type="button" id="plClose" aria-label="Thoát">×</button></div>
     <div class="pl-steps" id="plSteps"></div>
     <div class="pl-main">
       <div class="stage" id="plStageBox"><canvas id="plCanvas"></canvas><span class="cnt num" id="plCnt"></span></div>
@@ -1264,10 +1288,63 @@ function frame() {
 requestAnimationFrame(frame);
 addEventListener('resize', () => { stages.forEach(sizeCanvas); if (dlgStage) sizeCanvas(dlgStage); });
 
+/* ---------- Voice coach (Web Speech API, per-device settings) ---------- */
+const TTS_KEY = 'homereps-tts';
+const TTS_OK = typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined';
+let ttsCfg = { on: true, rate: 1, voice: '' };
+try { ttsCfg = Object.assign(ttsCfg, JSON.parse(localStorage.getItem(TTS_KEY) || '{}')); } catch (e) {}
+let voices = [];
+function saveTts() { try { localStorage.setItem(TTS_KEY, JSON.stringify(ttsCfg)); } catch (e) {} }
+function viVoices() { return voices.filter(v => /^vi/i.test(v.lang)); }
+function pickVoice() { return voices.find(v => v.voiceURI === ttsCfg.voice) || viVoices()[0] || null; }
+function ttsActive() { return TTS_OK && ttsCfg.on; }
+// Speaks and returns true; returns false when voice is off so callers can fall back to a beep.
+function say(text, interrupt = true) {
+  if (!ttsActive()) return false;
+  try {
+    if (interrupt) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text), v = pickVoice();
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'vi-VN';
+    u.rate = ttsCfg.rate;
+    speechSynthesis.speak(u);
+    return true;
+  } catch (e) { return false; }
+}
+const SAY_UNIT = { r: 'lần', b: 'lần mỗi bên', s: 'giây', sb: 'giây mỗi bên' };
+const sayDose = (amt, u) => u === 's' && amt >= 60 && amt % 60 === 0 ? `${amt / 60} phút` : `${amt} ${SAY_UNIT[u]}`;
+const SPK_ON = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
+const SPK_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+function renderTts() {
+  if ($('plVoice')) { $('plVoice').innerHTML = ttsActive() ? SPK_ON : SPK_OFF; $('plVoice').setAttribute('aria-pressed', ttsActive()); $('plVoice').hidden = !TTS_OK; }
+  if (!$('ttsOn')) return;
+  $('ttsOn').checked = ttsActive(); $('ttsOn').disabled = !TTS_OK;
+  $('ttsRate').value = ttsCfg.rate; $('ttsRateV').textContent = '×' + Number(ttsCfg.rate).toFixed(1).replace('.', ',');
+  const vi = viVoices(), other = voices.filter(v => !/^vi/i.test(v.lang));
+  const opt = v => `<option value="${esc(v.voiceURI)}"${v.voiceURI === ttsCfg.voice ? ' selected' : ''}>${esc(v.name)} (${esc(v.lang)})</option>`;
+  $('ttsVoice').innerHTML = `<option value="">Tự động${vi.length ? ': ' + esc(vi[0].name) : ''}</option>` +
+    (vi.length ? `<optgroup label="Tiếng Việt">${vi.map(opt).join('')}</optgroup>` : '') +
+    (other.length ? `<optgroup label="Ngôn ngữ khác">${other.map(opt).join('')}</optgroup>` : '');
+  $('ttsVoice').disabled = $('ttsRate').disabled = $('ttsTest').disabled = !TTS_OK;
+  $('ttsNote').textContent = !TTS_OK ? 'Trình duyệt này không hỗ trợ giọng đọc. Trang sẽ dùng tiếng bíp.'
+    : !voices.length ? 'Đang tải danh sách giọng…'
+    : vi.length ? `Máy có ${vi.length} giọng tiếng Việt. Trên iPhone, nếu không nghe thấy, hãy tắt chế độ im lặng.`
+    : 'Máy này chưa có giọng tiếng Việt nên sẽ đọc sai dấu. Cài thêm: Windows vào Cài đặt → Thời gian và ngôn ngữ → Giọng nói; Android vào Cài đặt → Chuyển văn bản thành giọng nói → Google, tải gói Tiếng Việt.';
+}
+if (TTS_OK) { voices = speechSynthesis.getVoices(); speechSynthesis.addEventListener ? speechSynthesis.addEventListener('voiceschanged', () => { voices = speechSynthesis.getVoices(); renderTts(); }) : (speechSynthesis.onvoiceschanged = () => { voices = speechSynthesis.getVoices(); renderTts(); }); }
+$('ttsOn').addEventListener('change', e => { ttsCfg.on = e.target.checked; saveTts(); renderTts(); if (ttsCfg.on) say('Đã bật giọng đọc.'); else if (TTS_OK) speechSynthesis.cancel(); });
+$('ttsVoice').addEventListener('change', e => { ttsCfg.voice = e.target.value; saveTts(); say('Xin chào, đây là giọng đọc hướng dẫn tập.'); });
+$('ttsRate').addEventListener('input', e => { ttsCfg.rate = +e.target.value; saveTts(); $('ttsRateV').textContent = '×' + ttsCfg.rate.toFixed(1).replace('.', ','); });
+$('ttsRate').addEventListener('change', () => say('Squat. Hiệp 1 trên 3. 12 lần.'));
+$('ttsTest').onclick = () => { if (!ttsActive()) { ttsCfg.on = true; saveTts(); renderTts(); } say('Chống đẩy. Hiệp 2 trên 3. 10 lần. Ba, hai, một.'); };
+$('plVoice').onclick = () => { ttsCfg.on = !ttsCfg.on; saveTts(); renderTts(); if (ttsCfg.on) say('Đã bật giọng đọc.'); else if (TTS_OK) speechSynthesis.cancel(); };
+renderTts();
+
 /* ---------- Rest timer ---------- */
 let restEnd = 0, restTotal = 0, restIv = null;
-function startRest(sec, nextLabel) {
-  restTotal = sec; restEnd = Date.now() + sec * 1000;
+let restSaid10 = false;
+function startRest(sec, nextLabel, spoken) {
+  restTotal = sec; restEnd = Date.now() + sec * 1000; restSaid10 = false;
+  say(`Nghỉ ${sec} giây.${spoken ? ' ' + spoken : ''}`);
   $('restNext').textContent = nextLabel;
   $('rest').hidden = false;
   clearInterval(restIv); tickRest(); restIv = setInterval(tickRest, 250);
@@ -1276,7 +1353,8 @@ function tickRest() {
   const left = Math.max(0, Math.ceil((restEnd - Date.now()) / 1000));
   $('restT').textContent = left + 's';
   $('restBar').style.width = (restTotal ? (1 - left / restTotal) * 100 : 100) + '%';
-  if (left <= 0) { stopRest(); toast('Hết giờ nghỉ, vào hiệp tiếp theo!'); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} }
+  if (left === 10 && restTotal > 15 && !restSaid10) { restSaid10 = true; say('Còn 10 giây.', false); }
+  if (left <= 0) { stopRest(); say('Hết giờ nghỉ. Vào hiệp tiếp theo.'); toast('Hết giờ nghỉ, vào hiệp tiếp theo!'); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} }
 }
 function stopRest() { clearInterval(restIv); $('rest').hidden = true; }
 $('restSkip').onclick = stopRest;
@@ -1308,13 +1386,13 @@ $('session').addEventListener('click', e => {
     save();
     const added = entry.sets[i] > have;
     renderSession(); renderDays(); renderWeek(); renderCal();
-    if (isDone(entry) && !wasDone) { stopRest(); toast('Hoàn thành buổi tập! Đã tự điểm danh hôm nay.'); }
+    if (isDone(entry) && !wasDone) { stopRest(); say('Hoàn thành buổi tập. Làm tốt lắm!'); toast('Hoàn thành buổi tập! Đã tự điểm danh hôm nay.'); }
     else if (added) {
       const it = d.x[i], more = entry.sets[i] < it[1];
       const nextIdx = more ? i : d.x.findIndex((x, j) => (entry.sets[j] || 0) < x[1]);
       if (nextIdx >= 0) {
         const nx = d.x[nextIdx];
-        startRest(more ? L.rest : Math.max(L.rest, 60), `Tiếp: ${X[nx[0]].vi} — hiệp ${(entry.sets[nextIdx] || 0) + 1}/${nx[1]}, ${nx[2]} ${UNIT[nx[3]]}`);
+        startRest(more ? L.rest : Math.max(L.rest, 60), `Tiếp: ${X[nx[0]].vi} — hiệp ${(entry.sets[nextIdx] || 0) + 1}/${nx[1]}, ${nx[2]} ${UNIT[nx[3]]}`, `Tiếp theo: ${X[nx[0]].vi}, hiệp ${(entry.sets[nextIdx] || 0) + 1}, ${sayDose(nx[2], nx[3])}.`);
       }
     }
     return;
@@ -1908,12 +1986,13 @@ function startPlayer() {
 }
 function enterStep() {
   const st = pl.steps[pl.i], L = LV(state.level), d = L.days[selDay];
-  pl.paused = false; $('plPause').textContent = '⏸ Dừng'; plClock = 0; pl.half = 0; pl.switched = false;
+  pl.paused = false; $('plPause').textContent = '⏸ Dừng'; plClock = 0; pl.half = 0; pl.switched = false; pl.lastBeep = null; pl.said10 = false;
+  let spoken = '';
   const phase = st.type === 'warm' || st.type === 'cool';
   const timed = st.type === 'rest' || (phase && isTime(st.w[2])) || (st.type === 'set' && setSec(d.x[st.i]) > 0);
   pl.left = !timed ? 0 : st.type === 'set' ? setSec(d.x[st.i]) : st.type === 'rest' ? st.sec : (st.w[2] === 'sb' ? st.w[1] * 2 : st.w[1]);
   pl.running = timed && st.type !== 'set';
-  pl.end = Date.now() + pl.left * 1000;
+  pl.end = Date.now() + pl.left * 1000; pl.total = pl.left;
   $('plSteps').innerHTML = pl.steps.slice(0, -1).map((x, j) => x.type === 'rest' ? '' : `<i class="${j < pl.i ? 'd' : j === pl.i ? 'c' : ''}"></i>`).join('');
   const kind = $('plKind'); kind.className = 'pl-kind' + (st.type === 'rest' ? ' rest' : '');
   $('plStageBox').hidden = st.type === 'done';
@@ -1927,6 +2006,7 @@ function enterStep() {
     $('plWhere').textContent = st.type === 'warm' ? 'Làm nóng cơ thể' : 'Thả lỏng sau buổi tập';
     $('plSub').textContent = (u === 'sb' ? `Bên thứ nhất ${amt} giây, nghe bíp thì đổi bên. ` : '') + X[id].tip;
     if (u === 'sb') pl.half = amt;
+    spoken = `${st.type === 'warm' ? 'Khởi động' : 'Giãn cơ'} ${st.j + 1} trên ${list.length}. ${X[id].vi}. ${sayDose(amt, u)}.${u === 'sb' ? ' Bắt đầu với bên thứ nhất.' : ''}${timed ? '' : ' Làm xong thì bấm xong.'}`;
     if (timed) $('plNext').textContent = 'Bỏ qua ›';
     else { $('plBig').innerHTML = `${amt}<small>${UNIT[u]}</small>`; $('plNext').textContent = '✓ Xong ›'; $('plNext').className = 'go good'; }
   } else if (st.type === 'set') {
@@ -1936,6 +2016,7 @@ function enterStep() {
     $('plName').textContent = info.vi;
     $('plSub').textContent = info.tip;
     $('plWhere').textContent = `${d.n} · ${L.key}`;
+    spoken = `${info.vi}. Hiệp ${st.k + 1} trên ${it[1]}. ${sayDose(it[2], it[3])}.${setSec(it) ? ' Sẵn sàng thì bấm bắt đầu đếm.' : ''}`;
     if (setSec(it)) { $('plNext').textContent = '▶ Bắt đầu đếm'; }
     else { $('plBig').innerHTML = `${it[2]}<small>${UNIT[it[3]]}</small>`; $('plNext').textContent = '✓ Xong hiệp'; $('plNext').className = 'go good'; }
   } else if (st.type === 'rest') {
@@ -1945,6 +2026,7 @@ function enterStep() {
     $('plName').textContent = 'Tiếp: ' + X[nx[0]].vi;
     $('plSub').textContent = `Hiệp ${st.nextK + 1}/${nx[1]} · ${nx[2]} ${UNIT[nx[3]]}. Hít thở sâu, uống ngụm nước.`;
     $('plNext').textContent = 'Bỏ qua nghỉ ›';
+    spoken = `Nghỉ ${Math.round(st.sec)} giây. Tiếp theo: ${X[nx[0]].vi}, hiệp ${st.nextK + 1}, ${sayDose(nx[2], nx[3])}.`;
   } else {
     kind.textContent = 'Hoàn thành';
     $('plName').textContent = 'Xong buổi tập!';
@@ -1953,8 +2035,10 @@ function enterStep() {
     $('plSub').textContent = `Đã điểm danh hôm nay. Chuỗi hiện tại: ${streak()} buổi.`;
     $('plNext').textContent = 'Đóng'; $('plNext').className = 'go good';
     beep(660, .15); setTimeout(() => beep(990, .3), 180);
+    spoken = `Hoàn thành buổi tập. Bạn đã làm ${setsDone(e)} hiệp. Làm tốt lắm!`;
   }
   $('plPrev').disabled = pl.i === 0;
+  if (spoken) say(spoken);
   plTick();
 }
 function fmt(sec) { sec = Math.max(0, Math.ceil(sec)); return sec >= 60 ? Math.floor(sec / 60) + ':' + pad(sec % 60) : sec + 's'; }
@@ -1968,11 +2052,12 @@ function plTick() {
   if ((st.type === 'warm' || st.type === 'cool') && !isTime(st.w[2])) return;
   if (pl.running && !pl.paused) pl.left = (pl.end - Date.now()) / 1000;
   if (pl.half && !pl.switched && pl.running && !pl.paused && pl.left <= pl.half) {
-    pl.switched = true; beep(880, .25); setTimeout(() => beep(880, .25), 300);
+    pl.switched = true; if (!say('Đổi bên.')) { beep(880, .25); setTimeout(() => beep(880, .25), 300); }
     $('plSub').textContent = 'Đổi bên! ' + X[st.w[0]].tip;
   }
   $('plBig').textContent = fmt(pl.left);
-  if (pl.running && !pl.paused && pl.left <= 3.2 && pl.left > 0 && Math.ceil(pl.left) !== pl.lastBeep) { pl.lastBeep = Math.ceil(pl.left); beep(660, .08); }
+  if (pl.running && !pl.paused && !pl.said10 && pl.left <= 10 && pl.left > 9 && pl.left + 1 < (pl.total || 0) && pl.total >= 20) { pl.said10 = true; say(st.type === 'rest' ? 'Còn 10 giây, chuẩn bị.' : 'Còn 10 giây.', false); }
+  if (pl.running && !pl.paused && pl.left <= 3.05 && pl.left > 0 && Math.ceil(pl.left) !== pl.lastBeep) { pl.lastBeep = Math.ceil(pl.left); if (!say(String(pl.lastBeep))) beep(660, .08); }
   if (pl.running && !pl.paused && pl.left <= 0) { pl.running = false; beep(990, .3); plAdvance(); }
 }
 function plAdvance() {
@@ -1994,7 +2079,7 @@ function tickSet(i) {
 $('plNext').onclick = () => {
   const st = pl.steps[pl.i], d = LV(state.level).days[selDay];
   if (st.type === 'set' && setSec(d.x[st.i]) && !pl.running) {
-    pl.running = true; pl.paused = false; pl.end = Date.now() + pl.left * 1000; beep(880, .12);
+    pl.running = true; pl.paused = false; pl.end = Date.now() + pl.left * 1000; if (!say('Bắt đầu.')) beep(880, .12);
     $('plNext').textContent = 'Xong sớm ›'; return;
   }
   plAdvance();
@@ -2011,10 +2096,11 @@ $('plPause').onclick = () => {
   pl.paused = !pl.paused;
   if (!pl.paused) pl.end = Date.now() + pl.left * 1000;
   $('plPause').textContent = pl.paused ? '▶ Chạy tiếp' : '⏸ Dừng';
+  say(pl.paused ? 'Tạm dừng.' : 'Tiếp tục.');
 };
 $('plClose').onclick = () => $('player').close();
 $('player').addEventListener('close', () => {
-  clearInterval(pl.iv); plStage = null; stopRest();
+  clearInterval(pl.iv); plStage = null; stopRest(); if (TTS_OK) speechSynthesis.cancel();
   const e = state.log[todayKey()];
   if (e && pl.active >= 30) { e.activeSec = Math.round((e.activeSec || 0) + pl.active); save(); }
   pl.active = 0;
