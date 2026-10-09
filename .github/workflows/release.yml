@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Loại phiên bản: patch = sửa lỗi nhỏ, minor = tính năng mới, major = thay đổi lớn"
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      notes:
+        description: "Ghi chú phát hành (tuỳ chọn)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next version
+        id: v
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          LAST=$(git tag -l 'v*.*.*' --sort=-v:refname | head -n1)
+          if [ -z "$LAST" ]; then
+            NEXT=v1.0.0
+          else
+            IFS=. read -r MA MI PA <<< "${LAST#v}"
+            case "$BUMP" in
+              major) MA=$((MA+1)); MI=0; PA=0 ;;
+              minor) MI=$((MI+1)); PA=0 ;;
+              *)     PA=$((PA+1)) ;;
+            esac
+            NEXT="v$MA.$MI.$PA"
+          fi
+          echo "Previous: ${LAST:-none} -> Next: $NEXT"
+          echo "tag=$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Package release zip
+        env:
+          TAG: ${{ steps.v.outputs.tag }}
+        run: |
+          mkdir -p dist/homereps
+          cp index.html exercises.js sw.js manifest.webmanifest icon.svg icon-192.png icon-512.png .nojekyll workout-plan.md dist/homereps/
+          sed -i "s/__APP_VERSION__/$TAG/g" dist/homereps/index.html dist/homereps/sw.js
+          (cd dist && zip -qr "homereps-$TAG.zip" homereps)
+
+      - name: Create tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" "dist/homereps-$TAG.zip" --title "HomeReps $TAG" --generate-notes --notes "$NOTES"
+
+      - name: Redeploy site so it shows the new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

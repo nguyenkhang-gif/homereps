@@ -1,0 +1,52 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check exercises.js
+          node --check sw.js
+          node -e "const s=require('fs').readFileSync('index.html','utf8');let n=0;for(const m of s.matchAll(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/g)){new Function(m[1]);n++}console.log('inline scripts ok:',n)"
+
+      - name: Build site with version stamp
+        run: |
+          VERSION=$(git describe --tags --always)
+          echo "Version: $VERSION"
+          mkdir _site
+          cp index.html exercises.js sw.js manifest.webmanifest icon.svg icon-192.png icon-512.png .nojekyll _site/
+          sed -i "s/__APP_VERSION__/$VERSION/g" _site/index.html _site/sw.js
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

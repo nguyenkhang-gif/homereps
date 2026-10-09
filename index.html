@@ -1,0 +1,1650 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111412">
+<meta name="description" content="HomeReps: giáo án tập toàn thân tại nhà, không dụng cụ, có animation từng động tác, checklist và điểm danh.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HomeReps">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>HomeReps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: training-log notebook — header + level switch, session card list with live figures, sidebar-ish tracking panels that stack on phones */
+:root {
+  --bg: #eef0eb;
+  --panel: #ffffff;
+  --panel-2: #f6f7f3;
+  --ink: #18201b;
+  --ink-2: #5b655e;
+  --line: #d9ddd5;
+  --accent: #2b55d9;
+  --accent-soft: #e3e9fb;
+  --good: #1f8a55;
+  --good-soft: #dcf1e5;
+  --warn: #c27a0e;
+  --warn-soft: #f8ecd6;
+  --bad: #c73c32;
+  --bad-soft: #f7e0de;
+  --fig: #18201b;
+  --fig-far: rgba(24,32,27,.38);
+  --prop: #a3aaa2;
+  --grid: rgba(24,32,27,.06);
+  --lv-1: #1f8a55; --lv-2: #c27a0e; --lv-3: #c73c32;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --body: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111412; --panel: #191d1a; --panel-2: #1f2420; --ink: #e8ece6; --ink-2: #9aa59c;
+    --line: #2c332e; --accent: #7f9cff; --accent-soft: #232b45; --good: #4fca88; --good-soft: #1b3326;
+    --warn: #e8a84a; --warn-soft: #3a2e19; --bad: #f07a70; --bad-soft: #3d201e;
+    --fig: #eef2ec; --fig-far: rgba(238,242,236,.34); --prop: #5d665f; --grid: rgba(238,242,236,.05);
+    --lv-1: #4fca88; --lv-2: #e8a84a; --lv-3: #f07a70; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111412; --panel: #191d1a; --panel-2: #1f2420; --ink: #e8ece6; --ink-2: #9aa59c;
+  --line: #2c332e; --accent: #7f9cff; --accent-soft: #232b45; --good: #4fca88; --good-soft: #1b3326;
+  --warn: #e8a84a; --warn-soft: #3a2e19; --bad: #f07a70; --bad-soft: #3d201e;
+  --fig: #eef2ec; --fig-far: rgba(238,242,236,.34); --prop: #5d665f; --grid: rgba(238,242,236,.05);
+  --lv-1: #4fca88; --lv-2: #e8a84a; --lv-3: #f07a70; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; margin: 0; padding-inline: 16px; padding-block: 0 96px; }
+.wrap { max-width: 1160px; margin: 0 auto; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; padding-block: 28px 18px; }
+.brand h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: .95; letter-spacing: .01em; text-transform: uppercase; }
+.brand h1 { display: flex; align-items: center; gap: 12px; text-transform: none; letter-spacing: 0; }
+.brand .logo { width: .95em; height: .95em; border-radius: 22%; flex: none; }
+.brand p { margin: 6px 0 0; color: var(--ink-2); font-size: .9rem; }
+.profile { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: .78rem; padding: 4px 10px; border: 1px solid var(--line); border-radius: 99px; background: var(--panel); color: var(--ink-2); }
+.chip b { color: var(--ink); font-weight: 600; }
+
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.lv { text-align: left; border: 1.5px solid var(--line); background: var(--panel); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 2px; transition: border-color .15s, background .15s; }
+.lv .k { font-family: var(--display); font-weight: 700; font-size: 1.35rem; text-transform: uppercase; letter-spacing: .02em; line-height: 1; }
+.lv .s { font-size: .78rem; color: var(--ink-2); }
+.lv .bars { display: flex; gap: 3px; margin-bottom: 4px; }
+.lv .bars i { width: 14px; height: 5px; border-radius: 2px; background: var(--line); }
+.lv[data-lv="0"] { --c: var(--lv-1); } .lv[data-lv="1"] { --c: var(--lv-2); } .lv[data-lv="2"] { --c: var(--lv-3); }
+.lv .bars i.on { background: var(--c); }
+.lv[aria-pressed="true"] { border-color: var(--c); background: var(--panel); box-shadow: inset 0 0 0 1px var(--c); }
+.lv[aria-pressed="true"] .k { color: var(--c); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-width: 0; gap: 18px; align-items: start; }
+@media (max-width: 940px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.days { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.day { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 7px 12px; text-align: left; min-width: 92px; }
+.day .w { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); font-weight: 600; }
+.day .n { font-weight: 600; font-size: .86rem; }
+.day[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.day[aria-pressed="true"] .w { color: inherit; opacity: .7; }
+.day .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--good); margin-left: 4px; vertical-align: 1px; }
+
+.session { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); margin-top: 10px; overflow: hidden; }
+.s-head { padding: 16px 18px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+.s-head h2 { font-family: var(--display); font-weight: 700; font-size: 1.7rem; text-transform: uppercase; line-height: 1; }
+.s-head .sub { color: var(--ink-2); font-size: .85rem; margin-top: 4px; }
+.totals { display: flex; gap: 18px; }
+.tot .v { font-family: var(--display); font-size: 1.7rem; font-weight: 700; line-height: 1; }
+.tot .l { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
+.progress { height: 4px; background: var(--panel-2); }
+.progress > i { display: block; height: 100%; background: var(--good); width: 0; transition: width .3s; }
+
+.phase { padding: 12px 18px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--line); background: var(--panel-2); font-size: .84rem; }
+.phase .lab { font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 700; color: var(--ink-2); min-width: 78px; }
+.phase .items { color: var(--ink-2); min-width: 0; flex: 1; }
+
+.ex { display: grid; grid-template-columns: 30px 168px minmax(0,1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: center; }
+.ex:last-of-type { border-bottom: 0; }
+.ex .idx { font-family: var(--display); font-size: 1.6rem; font-weight: 700; color: var(--ink-2); text-align: center; }
+.ex.done .idx { color: var(--good); }
+.stage { position: relative; background: var(--panel-2); border-radius: 10px; aspect-ratio: 200 / 150; width: 100%; max-width: 100%; border: 0; padding: 0; display: block; overflow: hidden; }
+.stage canvas { width: 100%; height: 100%; display: block; }
+.stage .cnt { position: absolute; right: 6px; top: 5px; font-family: var(--display); font-weight: 700; font-size: .95rem; color: var(--ink-2); background: var(--panel); border-radius: 6px; padding: 0 6px; }
+.ex-body { min-width: 0; display: grid; gap: 6px; }
+.ex-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.ex-name h3 { font-size: 1rem; font-weight: 700; }
+.ex-name .en { font-size: .78rem; color: var(--ink-2); }
+.ex-dose { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.dose { font-family: var(--display); font-weight: 700; font-size: 1.55rem; line-height: 1; }
+.dose small { font-family: var(--body); font-size: .75rem; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
+.muscle { font-size: .76rem; color: var(--ink-2); }
+.sets { display: flex; gap: 6px; flex-wrap: wrap; }
+.set { min-width: 54px; border: 1.5px solid var(--line); background: var(--panel); border-radius: 8px; padding: 4px 8px; font-size: .78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.set .bx { width: 14px; height: 14px; border: 1.5px solid var(--ink-2); border-radius: 4px; display: inline-grid; place-items: center; }
+.set[aria-pressed="true"] { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+.set[aria-pressed="true"] .bx { background: var(--good); border-color: var(--good); }
+.set[aria-pressed="true"] .bx::after { content: ''; width: 6px; height: 3px; border: 2px solid var(--panel); border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px,-1px); }
+@media (max-width: 560px) {
+  .lv { padding: 10px; } .lv .k { font-size: 1.1rem; } .lv .s { font-size: .7rem; }
+  .ex { grid-template-columns: 112px minmax(0,1fr); gap: 12px; padding: 12px 14px; }
+  .ex .idx { display: none; }
+  .s-head, .phase { padding-inline: 14px; }
+  .dose { font-size: 1.3rem; }
+}
+
+aside { display: grid; gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+.card h2 { font-family: var(--display); font-weight: 700; font-size: 1.25rem; text-transform: uppercase; letter-spacing: .02em; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.card h2 small { font-family: var(--body); text-transform: none; font-size: .78rem; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
+.muted { color: var(--ink-2); font-size: .82rem; }
+
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; }
+.wd { border: 1.5px solid var(--line); background: var(--panel); border-radius: 9px; padding: 6px 0 7px; display: grid; justify-items: center; gap: 2px; font-size: .7rem; }
+.wd .d { font-family: var(--display); font-size: 1.15rem; font-weight: 700; line-height: 1; }
+.wd .st { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: .7rem; font-weight: 700; }
+.wd.plan .st { border: 1.5px dashed var(--ink-2); }
+
+.wd.off { color: var(--ink-2); background: var(--panel-2); }
+.wd.off .st::after { content: '–'; }
+.wd.done { border-color: var(--good); }
+.wd.done .st { background: var(--good); color: var(--panel); }
+.wd.done .st::after { content: '✓'; }
+.wd.miss .st { background: var(--bad-soft); color: var(--bad); }
+.wd.miss .st::after { content: '×'; }
+.wd.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.stat { background: var(--panel-2); border-radius: 9px; padding: 8px 10px; }
+.stat .v { font-family: var(--display); font-weight: 700; font-size: 1.5rem; line-height: 1; }
+.stat .l { font-size: .68rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 9px; padding: 7px 12px; font-size: .83rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); }
+.btn:hover { border-color: var(--ink-2); }
+.btn.pri { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn.good { background: var(--good); color: var(--panel); border-color: var(--good); }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+
+.cal-head { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.cal-head .m { font-weight: 700; }
+.cal-nav { display: flex; gap: 4px; }
+.cal-nav button { border: 1px solid var(--line); background: var(--panel); border-radius: 7px; width: 30px; height: 28px; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 8px; }
+.cal .h { font-size: .64rem; text-align: center; color: var(--ink-2); font-weight: 600; text-transform: uppercase; }
+.cd { aspect-ratio: 1; border-radius: 7px; border: 0; background: transparent; font-size: .78rem; display: grid; place-items: center; position: relative; padding: 0; }
+.cd.out { opacity: .3; }
+.cd.plan::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--ink-2); opacity: .5; }
+.cd.done { background: var(--good); color: var(--panel); font-weight: 700; }
+.cd.done::after { display: none; }
+.cd.part { background: var(--warn-soft); color: var(--warn); font-weight: 700; }
+.cd.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .72rem; color: var(--ink-2); margin-top: 8px; }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.day-log { margin-top: 10px; font-size: .8rem; background: var(--panel-2); border-radius: 9px; padding: 8px 10px; }
+
+label.f { display: grid; gap: 3px; font-size: .75rem; color: var(--ink-2); font-weight: 600; }
+label.f input { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 6px 8px; font-size: .85rem; }
+.note { font-size: .75rem; color: var(--ink-2); margin-top: 8px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 9px; font-size: .84rem; z-index: 60; max-width: calc(100% - 32px); }
+
+.rest { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); display: flex; justify-content: center; }
+.rest .in { max-width: 1160px; width: 100%; display: flex; align-items: center; gap: 14px; }
+.rest .t { font-family: var(--display); font-size: 2.1rem; font-weight: 800; line-height: 1; min-width: 70px; }
+.rest .lbl { flex: 1; min-width: 0; font-size: .85rem; }
+.rest .lbl b { display: block; }
+.rest .bar { height: 3px; background: rgba(127,127,127,.35); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+.rest .bar i { display: block; height: 100%; background: var(--warn); }
+.rest button { background: transparent; color: inherit; border: 1px solid rgba(127,127,127,.5); border-radius: 8px; padding: 6px 10px; font-size: .8rem; }
+
+dialog { border: 0; border-radius: 16px; padding: 0; width: min(720px, calc(100% - 24px)); background: var(--panel); color: var(--ink); max-height: calc(100% - 24px); }
+dialog::backdrop { background: rgba(10,12,10,.55); }
+.dlg { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+.dlg .stage { border-radius: 0; aspect-ratio: 200/150; }
+.dlg .info { padding: 18px; display: grid; gap: 10px; align-content: start; }
+.dlg h3 { font-family: var(--display); font-size: 1.7rem; text-transform: uppercase; line-height: 1; }
+.dlg ol { margin: 0; padding-left: 18px; font-size: .88rem; display: grid; gap: 4px; }
+.dlg .tip { font-size: .82rem; background: var(--warn-soft); color: var(--ink); border-radius: 9px; padding: 8px 10px; }
+.dlg .tip b { color: var(--warn); }
+.dlg .ctl { display: flex; gap: 6px; flex-wrap: wrap; }
+.close { position: absolute; right: 10px; top: 10px; z-index: 2; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); font-size: 1.1rem; }
+@media (max-width: 640px) { .dlg { grid-template-columns: minmax(0,1fr); } }
+
+.mnav { display: none; }
+@media (max-width: 760px) {
+  body { padding-block: 0 calc(84px + env(safe-area-inset-bottom, 0px)); }
+  header.top { padding-block: 16px 12px; }
+  .brand p { font-size: .8rem; }
+  .profile { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .profile .chip { flex: 0 0 auto; }
+  [data-pane]:not(.on) { display: none !important; }
+  .grid { gap: 12px; }
+  .levels { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); padding-block: 6px; margin-bottom: 6px; }
+  .lv .s { display: none; }
+  .lv { padding: 8px 10px; }
+  .set { min-height: 40px; min-width: 76px; justify-content: center; font-size: .82rem; }
+  .set .bx { width: 18px; height: 18px; }
+  .day { min-width: 104px; padding: 9px 12px; }
+  .mnav { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+    background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .mnav button { border: 0; background: transparent; display: grid; justify-items: center; gap: 2px; padding: 6px 0; font-size: .7rem; font-weight: 600; color: var(--ink-2); border-radius: 10px; position: relative; }
+  .mnav button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .mnav button[aria-current="true"] { color: var(--accent); background: var(--accent-soft); }
+  .mnav .badge { position: absolute; top: 2px; right: calc(50% - 22px); background: var(--good); color: var(--panel); font-size: .6rem; border-radius: 99px; padding: 0 5px; line-height: 15px; }
+  .rest { bottom: calc(62px + env(safe-area-inset-bottom, 0px)); padding-bottom: 10px; }
+  .toast { bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
+  dialog { width: 100%; max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; margin: 0; }
+  .dlg .info { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.startbar { padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.startbar .btn.pri { font-size: 1rem; padding: 11px 20px; border-radius: 12px; }
+#player { width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; border-radius: 0; background: var(--bg); }
+.pl { height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; max-width: 720px; margin: 0 auto; padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); gap: 12px; }
+.pl-top { display: flex; align-items: center; gap: 10px; }
+.pl-top .where { flex: 1; min-width: 0; font-size: .8rem; color: var(--ink-2); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.pl-top button { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); font-size: 1.1rem; }
+.pl-steps { display: flex; gap: 3px; }
+.pl-steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.pl-steps i.d { background: var(--good); } .pl-steps i.c { background: var(--accent); }
+.pl-main { display: grid; align-content: center; gap: 10px; min-height: 0; text-align: center; }
+.pl-main .stage { max-height: 42vh; aspect-ratio: 200/150; width: auto; margin: 0 auto; max-width: 100%; }
+.pl-kind { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
+.pl-kind.rest { color: var(--warn); }
+.pl-name { font-family: var(--display); font-weight: 800; font-size: clamp(1.8rem, 7vw, 2.6rem); text-transform: uppercase; line-height: 1; }
+.pl-big { font-family: var(--display); font-weight: 800; font-size: clamp(4rem, 20vw, 7rem); line-height: .9; }
+.pl-big small { font-size: .3em; font-weight: 700; color: var(--ink-2); margin-left: 4px; }
+.pl-sub { color: var(--ink-2); font-size: .9rem; max-width: 52ch; margin: 0 auto; }
+.pl-ctl { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 8px; }
+.pl-ctl button { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 14px 8px; font-weight: 700; font-size: .95rem; }
+.pl-ctl .go { background: var(--ink); color: var(--bg); border-color: var(--ink); font-size: 1.05rem; }
+.pl-ctl .go.good { background: var(--good); border-color: var(--good); color: var(--panel); }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; padding: 7px 11px; font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg-l { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--ink-2); }
+.startbar .grow { flex: 1; }
+.edit-head { padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; border-bottom: 1px solid var(--line); background: var(--accent-soft); }
+.edit-head label.f input { min-width: 0; width: 200px; max-width: 100%; }
+.stp { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); overflow: hidden; }
+.stp button { border: 0; background: transparent; width: 34px; height: 34px; font-size: 1.05rem; font-weight: 700; }
+.stp b { min-width: 34px; text-align: center; font-family: var(--display); font-size: 1.15rem; }
+.stp span { font-size: .72rem; color: var(--ink-2); padding-right: 8px; }
+.ed-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ed-row select { border: 1px solid var(--line); border-radius: 9px; background: var(--panel); height: 36px; padding: 0 8px; font-size: .82rem; }
+.btn.sm { padding: 6px 10px; font-size: .78rem; }
+.btn.danger { color: var(--bad); }
+.hint { font-size: .74rem; color: var(--accent); }
+.ex.edit .stage .cnt { font-family: var(--body); font-size: .72rem; }
+.add-row { padding: 12px 18px; display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--line); }
+#picker { width: min(760px, calc(100% - 24px)); }
+.pk { padding: 18px; display: grid; gap: 14px; max-height: calc(100vh - 60px); overflow: auto; }
+.pk h3 { font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; }
+.pk h4 { margin: 0 0 6px; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
+.pk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.pk-item { border: 1.5px solid var(--line); background: var(--panel); border-radius: 10px; padding: 6px; text-align: left; display: grid; gap: 4px; }
+.pk-item:hover { border-color: var(--accent); }
+.pk-item.cur { border-color: var(--good); }
+.pk-item canvas { width: 100%; aspect-ratio: 200/150; background: var(--panel-2); border-radius: 7px; display: block; }
+.pk-item b { font-size: .82rem; line-height: 1.25; }
+.pk-item small { font-size: .7rem; color: var(--ink-2); }
+@media (max-width: 760px) { #picker { width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; border-radius: 0; } .pk { max-height: 100%; padding-top: calc(18px + env(safe-area-inset-top, 0px)); } .pk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.sch { display: grid; gap: 6px; margin-top: 10px; }
+.sch-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.sch-row .dn { font-weight: 700; font-size: .85rem; }
+.sch-row .dn small { display: block; font-weight: 500; font-size: .68rem; color: var(--ink-2); }
+.sch-row select { min-width: 0; width: 100%; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); height: 36px; padding: 0 8px; font-size: .82rem; }
+.sch-row.today .dn { color: var(--accent); }
+.sch-row.busy select { color: var(--bad); border-color: var(--bad); background: var(--bad-soft); }
+.sch-row.past select { opacity: .55; }
+.sch-row .tag { font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.tag.ok { background: var(--good-soft); color: var(--good); }
+.tag.mv { background: var(--accent-soft); color: var(--accent); }
+.sch-sum { margin-top: 10px; font-size: .8rem; padding: 8px 10px; border-radius: 9px; background: var(--panel-2); }
+.sch-sum.warn { background: var(--warn-soft); }
+.sch-sum.good { background: var(--good-soft); }
+.wd.busy { background: var(--bad-soft); color: var(--bad); }
+.wd.busy .st::after { content: 'B'; font-size: .62rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><img src="icon.svg" alt="" width="44" height="44" class="logo">HomeReps</h1>
+      <p>Sổ tập toàn thân tại nhà · không dụng cụ · 30–45 phút · 4–5 buổi/tuần</p>
+    </div>
+    <div class="profile">
+      <span class="chip"><b>66 kg</b> · 1m67</span>
+      <span class="chip">BMI <b class="num">23,7</b></span>
+      <span class="chip">Đạm <b class="num">105–130 g</b>/ngày</span>
+      <button class="chip" id="playToggle" type="button">⏸ Dừng hình</button>
+    </div>
+  </header>
+
+  <div class="levels" id="levels" role="group" aria-label="Cấp độ"></div>
+
+  <div class="grid">
+    <main style="min-width:0" data-pane="tap" class="on">
+      <div class="days" id="days" role="group" aria-label="Buổi tập"></div>
+      <section class="session" id="session"></section>
+    </main>
+
+    <aside>
+      <section class="card on" id="weekCard" data-pane="diem">
+        <h2>Điểm danh tuần <small id="weekRange"></small></h2>
+        <div class="week" id="week"></div>
+        <div class="stats" id="stats"></div>
+        <div class="row">
+          <button class="btn good" id="checkinBtn" type="button">✓ Điểm danh hôm nay</button>
+          <button class="btn" id="busyBtn" type="button">Bận? Dời lịch</button>
+        </div>
+        <p class="note">Hoàn thành hết checklist của buổi sẽ tự điểm danh. Bấm vào một ngày trong tuần để đánh dấu tay.</p>
+      </section>
+
+      <section class="card on" data-pane="lich" id="schedCard">
+        <h2>Ngày tập <small>dời lịch khi bận</small></h2>
+        <div class="row" style="margin-top:10px;justify-content:space-between">
+          <span class="seg" role="group" aria-label="Chế độ"><button type="button" data-sm="week" aria-pressed="true">Tuần này</button><button type="button" data-sm="def" aria-pressed="false">Lịch mặc định</button></span>
+          <span class="stp" title="Mục tiêu buổi mỗi tuần"><button type="button" id="goalMinus" aria-label="Giảm mục tiêu">−</button><b class="num" id="goalVal">4</b><span>buổi/tuần</span><button type="button" id="goalPlus" aria-label="Tăng mục tiêu">+</button></span>
+        </div>
+        <div class="sch" id="sch"></div>
+        <div class="sch-sum" id="schSum"></div>
+        <div class="row" id="schActions"></div>
+      </section>
+
+      <section class="card on" data-pane="lich">
+        <h2>Lịch tập <small>bấm ngày để xem</small></h2>
+        <div class="cal-head">
+          <span class="m" id="calMonth"></span>
+          <div class="cal-nav"><button type="button" id="calPrev" aria-label="Tháng trước">‹</button><button type="button" id="calNext" aria-label="Tháng sau">›</button></div>
+        </div>
+        <div class="cal" id="cal"></div>
+        <div class="legend"><span><i style="background:var(--good)"></i>Hoàn thành</span><span><i style="background:var(--warn-soft);border:1px solid var(--warn)"></i>Tập dở</span><span><i style="background:var(--ink-2);opacity:.5;border-radius:50%"></i>Ngày tập</span></div>
+        <div class="day-log" id="dayLog">Chọn một ngày để xem nhật ký.</div>
+      </section>
+
+      <section class="card on" data-pane="lich">
+        <h2>Nhắc lịch</h2>
+        <div class="row" style="margin-top:8px">
+          <label class="f" for="remindTime">Giờ tập<input type="time" id="remindTime" value="18:30"></label>
+        </div>
+        <div class="row">
+          <a class="btn pri" id="gcalLink" href="#" target="_blank" rel="noopener">＋ Google Calendar</a>
+          <button class="btn" id="icsBtn" type="button">Tải file .ics</button>
+        </div>
+        <p class="note">Tạo sự kiện lặp lại theo <b>lịch mặc định</b> trong mục Ngày tập, mỗi buổi 45 phút. File .ics mở được bằng Apple Calendar, Outlook.</p>
+      </section>
+
+      <section class="card on" data-pane="luu">
+        <h2>Sao lưu dữ liệu</h2>
+        <p class="muted" id="syncNote" style="margin:6px 0 0">Dữ liệu nằm trong trình duyệt này. Xuất file .json định kỳ để không bị mất, và để chuyển sang máy khác.</p>
+        <div class="sch-sum" id="backupInfo"></div>
+        <div class="row">
+          <button class="btn pri" id="expJson" type="button">Xuất .json</button>
+          <button class="btn" id="copyJson" type="button">Sao chép JSON</button>
+          <button class="btn" id="expMd" type="button">Xuất .md</button>
+        </div>
+        <div class="row">
+          <label class="btn" for="impFile" style="cursor:pointer">Nhập file .json</label>
+          <input type="file" id="impFile" accept=".json,.txt,application/json,text/plain" hidden>
+          <button class="btn" id="pasteBtn" type="button">Dán JSON</button>
+        </div>
+        <div id="pasteBox" hidden style="margin-top:10px">
+          <label class="f" for="pasteText">Dán nội dung JSON vào đây<textarea id="pasteText" rows="5" spellcheck="false" style="border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:8px;font:12px/1.4 ui-monospace,Menlo,monospace;resize:vertical;width:100%"></textarea></label>
+          <div class="row"><button class="btn pri sm" id="pasteRead" type="button">Đọc dữ liệu</button><button class="btn sm" id="pasteCancel" type="button">Đóng</button></div>
+        </div>
+        <div id="impPreview" class="sch-sum" hidden style="margin-top:10px"></div>
+        <div class="row" id="undoRow" hidden><button class="btn sm" id="undoImport" type="button">↶ Hoàn tác lần nhập vừa rồi</button></div>
+        <div class="row">
+          <button class="btn" id="resetToday" type="button">Xoá checklist hôm nay</button>
+        </div>
+        <p class="note">HomeReps <span class="num" id="appVer"></span></p>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<nav class="mnav" id="mnav" aria-label="Điều hướng">
+  <button type="button" data-go="tap" aria-current="true"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Tập</button>
+  <button type="button" data-go="diem"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>Điểm danh<span class="badge num" id="navBadge" hidden></span></button>
+  <button type="button" data-go="lich"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Lịch</button>
+  <button type="button" data-go="luu"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Lưu</button>
+</nav>
+<div class="rest" id="rest" hidden>
+  <div class="in">
+    <div class="t num" id="restT">60</div>
+    <div class="lbl"><b>Nghỉ giữa set</b><span id="restNext"></span><div class="bar"><i id="restBar"></i></div></div>
+    <button type="button" id="restAdd">+15s</button>
+    <button type="button" id="restSkip">Bỏ qua</button>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<dialog id="picker" aria-label="Chọn bài tập">
+  <button class="close" type="button" id="pkClose" aria-label="Đóng">×</button>
+  <div class="pk" id="pkBody"></div>
+</dialog>
+<dialog id="player" aria-label="Buổi tập">
+  <div class="pl">
+    <div class="pl-top"><span class="where num" id="plWhere"></span><button type="button" id="plClose" aria-label="Thoát">×</button></div>
+    <div class="pl-steps" id="plSteps"></div>
+    <div class="pl-main">
+      <div class="stage" id="plStageBox"><canvas id="plCanvas"></canvas><span class="cnt num" id="plCnt"></span></div>
+      <div class="pl-kind" id="plKind"></div>
+      <div class="pl-name" id="plName"></div>
+      <div class="pl-big num" id="plBig"></div>
+      <div class="pl-sub" id="plSub"></div>
+    </div>
+    <div class="pl-ctl">
+      <button type="button" id="plPrev">‹ Lùi</button>
+      <button type="button" id="plPause">⏸ Dừng</button>
+      <button type="button" class="go" id="plNext">Tiếp ›</button>
+    </div>
+  </div>
+</dialog>
+<dialog id="dlg">
+  <button class="close" type="button" id="dlgClose" aria-label="Đóng">×</button>
+  <div class="dlg">
+    <div class="stage"><canvas id="dlgCanvas"></canvas><span class="cnt num" id="dlgCnt"></span></div>
+    <div class="info">
+      <div class="muted" id="dlgMuscle"></div>
+      <h3 id="dlgName"></h3>
+      <div class="dose" id="dlgDose"></div>
+      <ol id="dlgSteps"></ol>
+      <div class="tip" id="dlgTip"></div>
+      <div class="ctl">
+        <button class="btn" type="button" data-speed="0.5">Chậm ×0.5</button>
+        <button class="btn" type="button" data-speed="1">Bình thường</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script id="rig">
+/* ---------- Skeleton rig: fixed bone lengths + two-bone IK ----------
+   Conventions: side view faces right. Prone (face-down) bodies have head on the RIGHT,
+   supine (face-up) bodies have head on the LEFT. That keeps knee/elbow bend directions anatomical. */
+const L = { T: 40, N: 13, R: 7, UA: 22, FA: 20, TH: 30, SH: 30, FT: 10, SW: 7, HW: 5 };
+const GROUND = 128;
+const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+
+function ik(a, t, l1, l2, s) {
+  const dx = t[0] - a[0], dy = t[1] - a[1];
+  let d = Math.hypot(dx, dy);
+  const th = Math.atan2(dy, dx);
+  d = Math.min(Math.max(d, Math.abs(l1 - l2) + 0.01), l1 + l2 - 0.01);
+  const c = (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d);
+  const al = Math.acos(Math.max(-1, Math.min(1, c)));
+  return [[a[0] + l1 * Math.cos(th + s * al), a[1] + l1 * Math.sin(th + s * al)], [a[0] + d * Math.cos(th), a[1] + d * Math.sin(th)]];
+}
+
+function P(h, t, a, l, o) { o = o || {}; return { h: h, t: t, n: o.n || 0, a: a, l: l, fp: o.fp || [0, 0] }; }
+
+// Plank line pivoting on an ankle (leg=60) or knee (leg=30); shY = wanted shoulder height.
+function prone(px, py, leg, shY) {
+  const s = Math.max(-1, Math.min(1, (py - shY) / (leg + L.T)));
+  const b = Math.asin(s), c = Math.cos(b);
+  const h = [px + leg * c, py - leg * s];
+  return { h: h, t: -b * R2D, sh: [h[0] + L.T * c, h[1] - L.T * s] };
+}
+
+function solve(p, front) {
+  const tr = p.t * D2R, ux = Math.cos(tr), uy = Math.sin(tr);
+  const sh = [p.h[0] + L.T * ux, p.h[1] + L.T * uy];
+  const hr = (p.t + p.n) * D2R;
+  const head = [sh[0] + L.N * Math.cos(hr), sh[1] + L.N * Math.sin(hr)];
+  const neck = [sh[0] + (L.N - L.R) * Math.cos(hr), sh[1] + (L.N - L.R) * Math.sin(hr)];
+  const px = -uy, py = ux;
+  const limbs = [];
+  for (let i = 0; i < 2; i++) {
+    const side = front ? (i ? 1 : -1) : 0;
+    const S = [sh[0] + side * L.SW * px, sh[1] + side * L.SW * py];
+    const H = [p.h[0] + side * L.HW * px, p.h[1] + side * L.HW * py];
+    const arm = ik(S, p.a[i], L.UA, L.FA, front ? (i ? 1 : -1) : 1);
+    const leg = ik(H, p.l[i], L.TH, L.SH, front ? (i ? -1 : 1) : -1);
+    const knee = leg[0], ank = leg[1];
+    let fa;
+    if (front) fa = i ? 15 : 165;
+    else fa = Math.atan2(ank[1] - knee[1], ank[0] - knee[0]) * R2D - 90 + (p.fp[i] || 0);
+    const toe = [ank[0] + L.FT * Math.cos(fa * D2R), ank[1] + L.FT * Math.sin(fa * D2R)];
+    limbs.push({ S: S, H: H, elbow: arm[0], hand: arm[1], knee: knee, ankle: ank, toe: toe });
+  }
+  return { sh: sh, hip: p.h, head: head, neck: neck, limbs: limbs };
+}
+
+function lerp(a, b, u) { return a + (b - a) * u; }
+function lerpPt(a, b, u) { return [lerp(a[0], b[0], u), lerp(a[1], b[1], u)]; }
+function blend(A, B, u) {
+  return {
+    h: lerpPt(A.h, B.h, u), t: lerp(A.t, B.t, u), n: lerp(A.n, B.n, u),
+    a: [lerpPt(A.a[0], B.a[0], u), lerpPt(A.a[1], B.a[1], u)],
+    l: [lerpPt(A.l[0], B.l[0], u), lerpPt(A.l[1], B.l[1], u)],
+    fp: [lerp(A.fp[0], B.fp[0], u), lerp(A.fp[1], B.fp[1], u)]
+  };
+}
+const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+
+// keys: [pose, moveSeconds, holdSeconds]
+function cycleLen(ex) { return ex.keys.reduce((s, k) => s + k[1] + (k[2] || 0), 0); }
+function poseAt(ex, time) {
+  const keys = ex.keys, total = cycleLen(ex);
+  let t = ((time % total) + total) % total;
+  for (let i = 0; i < keys.length; i++) {
+    const hold = keys[i][2] || 0, mv = keys[i][1];
+    if (t < hold) return keys[i][0];
+    t -= hold;
+    if (t < mv) return blend(keys[i][0], keys[(i + 1) % keys.length][0], ease(t / mv));
+    t -= mv;
+  }
+  return keys[0][0];
+}
+
+const E = {};
+
+/* ---------- Drawing ---------- */
+function drawFigure(ctx, ex, time, colors, scale) {
+  const W = 200, H = 150, OY = -18;
+  ctx.setTransform(scale, 0, 0, scale, 0, -OY * scale);
+  ctx.clearRect(0, OY, W, H);
+  ctx.strokeStyle = colors.grid; ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let x = 20; x < W; x += 20) { ctx.moveTo(x, OY); ctx.lineTo(x, GROUND); }
+  for (let y = 8; y < GROUND; y += 20) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+  ctx.stroke();
+  ctx.strokeStyle = colors.prop; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(4, GROUND + 1); ctx.lineTo(W - 4, GROUND + 1); ctx.stroke();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  (ex.props || []).forEach(pr => {
+    ctx.strokeStyle = colors.prop; ctx.fillStyle = colors.propFill; ctx.lineWidth = 2;
+    if (pr.box) {
+      const [x, y, w] = pr.box;
+      ctx.fillRect(x, y, w, 4); ctx.strokeRect(x, y, w, 4);
+      ctx.beginPath(); ctx.moveTo(x + 3, y + 4); ctx.lineTo(x + 3, GROUND); ctx.moveTo(x + w - 3, y + 4); ctx.lineTo(x + w - 3, GROUND); ctx.stroke();
+    }
+    if (pr.wall) { ctx.fillRect(pr.wall - 8, 0, 8, GROUND); ctx.beginPath(); ctx.moveTo(pr.wall, 0); ctx.lineTo(pr.wall, GROUND); ctx.stroke(); }
+  });
+  const s = solve(poseAt(ex, time), ex.front);
+  const seg = (pts, col, w) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.stroke(); };
+  const limb = (lb, col, w) => {
+    seg([lb.H, lb.knee, lb.ankle, lb.toe], col, w);
+    seg([lb.S, lb.elbow, lb.hand], col, w * .9);
+  };
+  const far = ex.front ? colors.fig : colors.far;
+  limb(s.limbs[1], far, 5);
+  // torso
+  if (ex.front) {
+    seg([s.limbs[0].S, s.limbs[1].S], colors.fig, 5);
+    seg([s.limbs[0].H, s.limbs[1].H], colors.fig, 5);
+  }
+  seg([s.hip, s.sh, s.neck], colors.fig, 6.5);
+  ctx.fillStyle = colors.fig;
+  ctx.beginPath(); ctx.arc(s.head[0], s.head[1], L.R, 0, Math.PI * 2); ctx.fill();
+  limb(s.limbs[0], colors.fig, 5);
+  // joints
+  ctx.fillStyle = colors.accent;
+  [s.limbs[0].knee, s.limbs[0].elbow].forEach(j => { ctx.beginPath(); ctx.arc(j[0], j[1], 1.8, 0, Math.PI * 2); ctx.fill(); });
+}
+</script>
+<script src="exercises.js"></script>
+<script>
+/* ---------- Exercise catalogue ---------- */
+const X = EXERCISES;
+Object.keys(EXERCISES).forEach(id => { E[id] = EXERCISES[id].anim || EXERCISES.squat.anim; });
+
+/* ---------- Program ---------- */
+// [id, sets, amount, unit]  unit: r = reps, b = reps mỗi bên, s = giây, sb = giây mỗi bên
+const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+const DEFAULT_SCHEDULE = { 1: 0, 2: 1, 4: 2, 5: 3, 6: 4 }; // weekday (0 = CN) -> session index
+const BUSY = -2, OFF = -1;
+const LEVELS = [
+  { key: 'Cơ bản', sub: 'Tuần 1–4 · 3 hiệp · nghỉ 60s', rest: 60, bars: 1,
+    days: [
+      { n: 'Toàn thân A', f: 'Đùi, ngực, mông, core', x: [['squat', 3, 10, 'r'], ['kneepushup', 3, 8, 'r'], ['bridge', 3, 12, 'r'], ['birddog', 3, 6, 'b'], ['plank', 3, 20, 's'], ['march', 3, 40, 'r']] },
+      { n: 'Toàn thân B', f: 'Chân, lưng, core', x: [['lunge', 3, 6, 'b'], ['superman', 3, 10, 'r'], ['wallsit', 3, 20, 's'], ['deadbug', 3, 6, 'b'], ['calf', 3, 15, 'r'], ['jumpingjack', 3, 20, 'r']] },
+      { n: 'Toàn thân C', f: 'Đẩy, chân, bụng', x: [['squat', 3, 12, 'r'], ['kneepushup', 3, 10, 'r'], ['bridge', 3, 15, 'r'], ['crunch', 3, 12, 'r'], ['plank', 3, 25, 's'], ['jumpingjack', 3, 25, 'r']] },
+      { n: 'Toàn thân D', f: 'Chân, lưng, core', x: [['lunge', 3, 8, 'b'], ['superman', 3, 12, 'r'], ['wallsit', 3, 30, 's'], ['deadbug', 3, 8, 'b'], ['calf', 3, 20, 'r'], ['march', 3, 60, 'r']] },
+      { n: 'Cardio nhẹ + Core', f: 'Buổi tuỳ chọn', opt: true, x: [['jumpingjack', 3, 30, 'r'], ['march', 3, 60, 'r'], ['crunch', 3, 15, 'r'], ['birddog', 3, 8, 'b'], ['plank', 3, 30, 's']] }
+    ] },
+  { key: 'Trung bình', sub: 'Tuần 5–8 · 3–4 hiệp · nghỉ 45s', rest: 45, bars: 2,
+    days: [
+      { n: 'Đẩy + Chân', f: 'Ngực, vai, đùi, mông', x: [['squat', 4, 15, 'r'], ['pushup', 4, 10, 'r'], ['lunge', 3, 10, 'b'], ['pike', 3, 8, 'r'], ['plank', 3, 45, 's'], ['bicycle', 3, 16, 'r']] },
+      { n: 'Kéo + Mông', f: 'Lưng, tay sau, mông, core', x: [['singlebridge', 3, 10, 'b'], ['dip', 3, 10, 'r'], ['superman', 3, 15, 'r'], ['wallsit', 3, 45, 's'], ['legraise', 3, 12, 'r'], ['sideplank', 3, 25, 'sb']] },
+      { n: 'Toàn thân HIIT', f: 'Tim mạch, sức bền', x: [['squatthrust', 4, 10, 'r'], ['mountain', 4, 30, 'r'], ['highknees', 4, 40, 'r'], ['pushup', 3, 12, 'r'], ['russian', 3, 20, 'r']] },
+      { n: 'Đẩy + Chân 2', f: 'Ngực, vai, chân', x: [['pushup', 4, 12, 'r'], ['squat', 4, 18, 'r'], ['pike', 3, 10, 'r'], ['bridge', 3, 20, 'r'], ['calf', 3, 25, 'r'], ['flutter', 3, 30, 's']] },
+      { n: 'Core + Cardio', f: 'Buổi tuỳ chọn', opt: true, x: [['mountain', 3, 40, 'r'], ['highknees', 3, 40, 'r'], ['bicycle', 3, 20, 'r'], ['legraise', 3, 12, 'r'], ['plank', 3, 60, 's']] }
+    ] },
+  { key: 'Nâng cao', sub: 'Tuần 9+ · 4 hiệp · nghỉ 30s', rest: 30, bars: 3,
+    days: [
+      { n: 'Sức mạnh toàn thân', f: 'Ngực, chân, core', x: [['jumpsquat', 4, 15, 'r'], ['decline', 4, 12, 'r'], ['bulgarian', 4, 10, 'b'], ['diamond', 3, 12, 'r'], ['vup', 3, 12, 'r'], ['hollow', 3, 30, 's']] },
+      { n: 'Vai + Mông', f: 'Vai, tay sau, mông', x: [['burpee', 4, 10, 'r'], ['pike', 4, 10, 'r'], ['singlebridge', 4, 15, 'b'], ['dip', 4, 15, 'r'], ['sideplank', 3, 45, 'sb'], ['flutter', 3, 45, 's']] },
+      { n: 'HIIT cường độ cao', f: 'Tim mạch, sức bền', x: [['burpee', 4, 12, 'r'], ['jumpsquat', 4, 15, 'r'], ['mountain', 4, 50, 'r'], ['pushup', 4, 20, 'r'], ['highknees', 4, 60, 'r'], ['russian', 3, 30, 'r']] },
+      { n: 'Chân + Đẩy', f: 'Đùi, mông, ngực trên', x: [['bulgarian', 4, 12, 'b'], ['decline', 4, 15, 'r'], ['wallsit', 3, 60, 's'], ['superman', 3, 20, 'r'], ['vup', 3, 15, 'r'], ['legraise', 3, 15, 'r']] },
+      { n: 'Finisher', f: 'Buổi tuỳ chọn', opt: true, x: [['burpee', 5, 12, 'r'], ['mountain', 4, 60, 'r'], ['jumpsquat', 4, 15, 'r'], ['hollow', 3, 40, 's'], ['plank', 3, 90, 's']] }
+    ] }
+];
+const WARMUP = 'Bật nhảy dang tay chân 45s · Xoay vai, hông, cổ tay 1 phút · Đi bộ nâng gối 45s · Squat nhẹ 10 cái · Chống đẩy quỳ 5 cái';
+const COOLDOWN = 'Tư thế em bé 30s · Kéo giãn đùi sau 20s/bên · Kéo giãn đùi trước 20s/bên · Mở ngực vào khung cửa 30s · Thở sâu 1 phút';
+
+const UNIT = { r: 'rep', b: 'rep/bên', s: 'giây', sb: 'giây/bên' };
+const GROUPS = EXERCISE_GROUPS.map(g => [g.vi, Object.keys(X).filter(id => X[id].group === g.id)]);
+const defDose = id => X[id].dose || [10, 'r'];
+const isTime = u => u === 's' || u === 'sb';
+const INTENSITY = [
+  { k: 'Nhẹ', f: .75, r: 15, d: 'Giảm 25% số rep/giây, nghỉ thêm 15s' },
+  { k: 'Chuẩn', f: 1, r: 0, d: 'Đúng giáo án' },
+  { k: 'Nặng', f: 1.25, r: -15, d: 'Tăng 25% số rep/giây, nghỉ bớt 15s' }
+];
+function scaleAmt(a, u, f) {
+  if (f === 1) return a;
+  return isTime(u) ? Math.max(5, Math.round(a * f / 5) * 5) : Math.max(1, Math.round(a * f));
+}
+function rawDays(lv) { return (state.custom && state.custom[lv]) || LEVELS[lv].days; }
+function LV(lv) {
+  const b = LEVELS[lv]; if (!b) return null;
+  const I = INTENSITY[state.intensity] || INTENSITY[1];
+  const baseRest = (state.rest && state.rest[lv]) ?? b.rest;
+  return Object.assign({}, b, {
+    rest: Math.max(15, baseRest + I.r), baseRest,
+    days: rawDays(lv).map(d => Object.assign({}, d, { x: d.x.filter(it => X[it[0]]).map(it => [it[0], it[1], scaleAmt(it[2], it[3], I.f), it[3]]) }))
+  });
+}
+function workSec(item) {
+  const [id, , amt, u] = item;
+  if (u === 's') return amt;
+  if (u === 'sb') return amt * 2 + 5;
+  return amt * X[id].sec * (u === 'b' ? 2 : 1);
+}
+function sessionMinutes(lv, day) {
+  const L = LV(lv), d = L.days[day];
+  let s = 10 * 60;
+  d.x.forEach(it => { s += it[1] * workSec(it) + (it[1] - 1) * L.rest + 60; });
+  return Math.round(s / 60);
+}
+function totalVolume(day) { return day.x.reduce((s, it) => s + it[1], 0); }
+
+/* ---------- State ---------- */
+const KEY = 'homereps-v1';
+const LEGACY_KEYS = ['so-tap-v2'];
+const APP_VERSION = '__APP_VERSION__'.startsWith('__') ? 'dev' : '__APP_VERSION__';
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const todayKey = () => ymd(new Date());
+
+let state = { version: 4, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
+try {
+  let raw = localStorage.getItem(KEY);
+  // one-time move of data saved under the app's previous name
+  if (!raw) { const old = LEGACY_KEYS.map(k => localStorage.getItem(k)).find(Boolean); if (old) { raw = old; localStorage.setItem(KEY, old); } }
+  if (raw) state = Object.assign(state, JSON.parse(raw));
+} catch (e) {}
+function mondayKey(d) { return ymd(weekDates(d)[0]); }
+function defaultSchedule() { return state.schedule || DEFAULT_SCHEDULE; }
+// Session index planned for a date, honouring this week's overrides; undefined = no session.
+function planFor(dt) {
+  const o = state.weekPlan && state.weekPlan[mondayKey(dt)];
+  const v = o && o[dt.getDay()] !== undefined ? o[dt.getDay()] : defaultSchedule()[dt.getDay()];
+  return v === undefined || v < 0 ? undefined : v;
+}
+function isBusy(dt) { const o = state.weekPlan && state.weekPlan[mondayKey(dt)]; return !!o && o[dt.getDay()] === BUSY; }
+function weekGoal() { return state.goal || 4; }
+let selDay = planFor(new Date()) ?? 0;
+
+let cloud = null, cloudTimer = null, cloudBusy = false;
+function save() {
+  state.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  if (cloud) { clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 900); }
+}
+async function pushCloud() {
+  if (!cloud || cloudBusy) return;
+  cloudBusy = true;
+  try { await cloud.set({ json: JSON.stringify(state), updatedAt: state.updatedAt }); }
+  catch (e) { if (e && e.code === 'invalid_argument') { cloud = null; syncNote('Không lưu được lên tài khoản, tiến độ vẫn ở trong trình duyệt này.'); } }
+  cloudBusy = false;
+}
+function syncNote(t) { document.getElementById('syncNote').textContent = t; }
+
+function planOf(e) { return e.plan || LV(e.level)?.days[e.day]?.x; }
+function isDone(entry) {
+  if (!entry) return false;
+  if (entry.manual) return true;
+  const x = planOf(entry);
+  if (!x) return false;
+  return x.every((it, i) => (entry.sets?.[i] || 0) >= it[1]);
+}
+function setsDone(entry) { return entry ? Object.values(entry.sets || {}).reduce((a, b) => a + b, 0) : 0; }
+
+/* ---------- Rendering ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function renderLevels() {
+  $('levels').innerHTML = LEVELS.map((l, i) => `
+    <button class="lv" type="button" data-lv="${i}" aria-pressed="${state.level === i}">
+      <span class="bars">${[0, 1, 2].map(b => `<i class="${b < l.bars ? 'on' : ''}"></i>`).join('')}</span>
+      <span class="k">${l.key}</span><span class="s">${l.sub}</span>
+    </button>`).join('');
+}
+
+function renderDays() {
+  const L = LV(state.level);
+  const wk = weekDates();
+  const tk = todayKey();
+  const wdOf = idx => { const dt = wk.find(x => ymd(x) >= tk && planFor(x) === idx) || wk.find(x => planFor(x) === idx); return dt ? WEEKDAYS[dt.getDay()] + ' ' + dt.getDate() : 'Chưa xếp'; };
+  $('days').innerHTML = L.days.map((d, i) => {
+    const doneThisWeek = weekDates().some(dt => { const e = state.log[ymd(dt)]; return e && e.level === state.level && e.day === i && isDone(e); });
+    return `<button class="day" type="button" data-day="${i}" aria-pressed="${selDay === i}">
+      <div class="w">${wdOf(i)}${d.opt ? ' · tuỳ chọn' : ''}${doneThisWeek ? '<span class="dot" title="Đã tập tuần này"></span>' : ''}</div>
+      <div class="n">${esc(d.n)}</div></button>`;
+  }).join('');
+}
+
+let stages = [];
+function currentEntry() {
+  const e = state.log[todayKey()];
+  return e && !e.manual && e.level === state.level && e.day === selDay ? e : null;
+}
+function renderSession() {
+  const L = LV(state.level), d = L.days[selDay];
+  const entry = currentEntry();
+  const total = totalVolume(d), done = entry ? d.x.reduce((s, it, i) => s + Math.min(entry.sets?.[i] || 0, it[1]), 0) : 0;
+  $('session').innerHTML = `
+    <div class="s-head">
+      <div><h2>${esc(d.n)}</h2><div class="sub">${esc(d.f)} · ${L.key} · nghỉ ${L.rest}s giữa hiệp</div></div>
+      <div class="totals">
+        <div class="tot"><div class="v num">${sessionMinutes(state.level, selDay)}′</div><div class="l">thời gian</div></div>
+        <div class="tot"><div class="v num">${d.x.length}</div><div class="l">bài</div></div>
+        <div class="tot"><div class="v num" id="setCount">${done}/${total}</div><div class="l">hiệp xong</div></div>
+      </div>
+    </div>
+    <div class="progress"><i id="prog" style="width:${total ? done / total * 100 : 0}%"></i></div>
+    ${editMode ? editHead(L, d) : `<div class="startbar"><button class="btn pri" type="button" id="startBtn">${done === 0 ? '▶ Bắt đầu buổi tập' : done >= total ? '↻ Tập lại từ đầu' : '▶ Tiếp tục buổi tập'}</button>
+      <span class="grow"></span>
+      <span class="seg-l">Cường độ</span><span class="seg" role="group" aria-label="Cường độ">${INTENSITY.map((I, j) => `<button type="button" data-int="${j}" title="${I.d}" aria-pressed="${(state.intensity ?? 1) === j}">${I.k}</button>`).join('')}</span>
+      <button class="btn" type="button" id="editBtn">✎ Chỉnh bài</button></div>`}
+    <div class="phase"><span class="lab">Khởi động 5′</span><span class="items">${WARMUP}</span></div>
+    ${editMode ? editRows(d) : d.x.map((it, i) => {
+      const [id, sets, amt, u] = it, info = X[id], have = entry?.sets?.[i] || 0;
+      return `<div class="ex${have >= sets ? ' done' : ''}" data-i="${i}">
+        <div class="idx num">${i + 1}</div>
+        <button class="stage" type="button" data-open="${i}" aria-label="Xem hướng dẫn ${esc(info.vi)}"><canvas></canvas><span class="cnt num"></span></button>
+        <div class="ex-body">
+          <div class="ex-name"><h3>${esc(info.vi)}</h3><span class="en">${esc(info.en)}</span></div>
+          <div class="ex-dose"><span class="dose num">${sets} × ${amt}<small>${UNIT[u]}</small></span><span class="muscle">${esc(info.m)}</span></div>
+          <div class="sets">${Array.from({ length: sets }, (_, k) => `<button class="set" type="button" data-ex="${i}" data-k="${k}" aria-pressed="${k < have}"><span class="bx"></span>Hiệp ${k + 1}</button>`).join('')}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="phase" style="border-top:1px solid var(--line);border-bottom:0"><span class="lab">Giãn cơ 5′</span><span class="items">${COOLDOWN}</span></div>`;
+  stages = [...$('session').querySelectorAll('.ex')].map((el, i) => ({
+    canvas: el.querySelector('canvas'), cnt: el.querySelector('.cnt'), ex: E[d.x[i][0]], start: performance.now() / 1000 - i * .37
+  }));
+  stages.forEach(sizeCanvas);
+}
+
+function weekDates(ref) {
+  const d = ref ? new Date(ref) : new Date();
+  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i));
+}
+function dayStatus(dt) {
+  const k = ymd(dt), e = state.log[k], t = todayKey();
+  if (isDone(e)) return 'done';
+  const pi = planFor(dt), planned = pi !== undefined;
+  if (isBusy(dt) && !(e && setsDone(e) > 0)) return 'busy';
+  if (e && setsDone(e) > 0) return 'part';
+  if (!planned) return 'rest';
+  const first = Object.keys(state.log).sort()[0];
+  if (k < t && first && k >= first && !LV(state.level).days[pi]?.opt) return 'miss';
+  return 'plan';
+}
+function streak() {
+  let n = 0; const d = new Date();
+  if (!isDone(state.log[ymd(d)])) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 400; i++) {
+    if (isDone(state.log[ymd(d)])) n++;
+    else if (planFor(d) !== undefined && !LV(state.level).days[planFor(d)]?.opt) break;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+var renderWeek = function () {
+  const days = weekDates(), t = todayKey();
+  $('weekRange').textContent = `${days[0].getDate()}/${days[0].getMonth() + 1} – ${days[6].getDate()}/${days[6].getMonth() + 1}`;
+  $('week').innerHTML = days.map(dt => {
+    let st = dayStatus(dt); if (st === 'part') st = 'plan'; if (st === 'rest') st = 'off';
+    return `<button type="button" class="wd ${st}${ymd(dt) === t ? ' today' : ''}" data-date="${ymd(dt)}" aria-label="${WEEKDAYS[dt.getDay()]} ${dt.getDate()}: ${st}">
+      <span>${WEEKDAYS[dt.getDay()]}</span><span class="d num">${dt.getDate()}</span><span class="st"></span></button>`;
+  }).join('');
+  const doneWeek = days.filter(dt => isDone(state.log[ymd(dt)])).length;
+  const all = Object.keys(state.log).filter(k => isDone(state.log[k])).length;
+  const totalSets = Object.values(state.log).reduce((s, e) => s + setsDone(e), 0);
+  $('stats').innerHTML = `
+    <div class="stat"><div class="v num">${doneWeek}/${weekGoal()}</div><div class="l">Tuần này</div></div>
+    <div class="stat"><div class="v num">${streak()}</div><div class="l">Chuỗi buổi</div></div>
+    <div class="stat"><div class="v num">${all}</div><div class="l">Tổng buổi · ${totalSets} hiệp</div></div>`;
+  const te = state.log[t];
+  $('checkinBtn').textContent = isDone(te) ? '✓ Hôm nay đã điểm danh' : '✓ Điểm danh hôm nay';
+}
+
+let calRef = new Date(); calRef.setDate(1);
+let calSel = todayKey();
+function renderCal() {
+  const y = calRef.getFullYear(), m = calRef.getMonth();
+  $('calMonth').textContent = `Tháng ${m + 1}/${y}`;
+  const first = new Date(y, m, 1), off = (first.getDay() + 6) % 7, t = todayKey();
+  let html = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(h => `<div class="h">${h}</div>`).join('');
+  for (let i = 0; i < 42; i++) {
+    const dt = new Date(y, m, 1 - off + i), k = ymd(dt), st = dayStatus(dt);
+    const cls = ['cd', dt.getMonth() !== m ? 'out' : '', st === 'done' ? 'done' : st === 'part' ? 'part' : (st === 'plan' || st === 'miss') ? 'plan' : '', k === t ? 'today' : ''].join(' ');
+    html += `<button type="button" class="${cls}" data-date="${k}">${dt.getDate()}</button>`;
+    if (i >= 34 && new Date(y, m, 1 - off + i + 1).getMonth() !== m && (i + 1) % 7 === 0) break;
+  }
+  $('cal').innerHTML = html;
+  renderDayLog();
+}
+function renderDayLog() {
+  const e = state.log[calSel], dt = parseYmd(calSel);
+  const head = `<b>${WEEKDAYS[dt.getDay()]}, ${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}</b>`;
+  if (!e) {
+    const p = planFor(dt);
+    $('dayLog').innerHTML = head + '<br>' + (p !== undefined ? `Lịch: ${esc(LV(state.level).days[p].n)} (${LEVELS[state.level].key})` : 'Ngày nghỉ, phục hồi.');
+    return;
+  }
+  if (e.manual) { $('dayLog').innerHTML = head + '<br>Đã điểm danh (đánh dấu tay).'; return; }
+  const d = LV(e.level).days[e.day] || { n: '' }, px = planOf(e) || [];
+  $('dayLog').innerHTML = head + ` · ${LEVELS[e.level].key} · ${esc(d.n)}${isDone(e) ? ' · <span style="color:var(--good);font-weight:700">Hoàn thành</span>' : ''}<br>` +
+    px.map((it, i) => `${esc(X[it[0]].vi)}: ${e.sets?.[i] || 0}/${it[1]} hiệp`).join('<br>');
+}
+
+function renderAll() { if (typeof renderBackup === 'function') try { renderBackup(); } catch (e) {} renderLevels(); renderDays(); renderSession(); renderWeek(); renderCal(); renderGcal(); if (typeof renderSched === 'function' && $('sch')) renderSched(); }
+
+/* ---------- Animation loop ---------- */
+let plStage = null, plClock = 0;
+let playing = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let speed = 1, dlgStage = null;
+function sizeCanvas(st) {
+  const r = st.canvas.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+  st.canvas.width = Math.max(1, Math.round(r.width * dpr)); st.canvas.height = Math.max(1, Math.round(r.height * dpr));
+  st.scale = st.canvas.width / 200;
+}
+let colors = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+  colors = { fig: g('--fig'), far: g('--fig-far'), prop: g('--prop'), propFill: g('--panel'), grid: g('--grid'), accent: g('--accent') };
+}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setTimeout(readColors, 30));
+new MutationObserver(() => setTimeout(readColors, 30)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+let clock = 0, last = performance.now() / 1000;
+function frame() {
+  const now = performance.now() / 1000;
+  if (playing) clock += (now - last);
+  if (plStage && !pl.paused) plClock += (now - last);
+  last = now;
+  const list = plStage ? [plStage] : dlgStage ? [dlgStage] : stages;
+  list.forEach(st => {
+    if (!st.canvas.isConnected) return;
+    const ctx = st.canvas.getContext('2d');
+    const t = (st === dlgStage ? clock * speed : st === plStage ? plClock : clock) + (st.offset || 0);
+    drawFigure(ctx, st.ex, t, colors, st.scale);
+    if (st.cnt) {
+      const c = cycleLen(st.ex);
+      st.cnt.textContent = st.ex.hold ? Math.floor(t % 30 + 1) + 's' : '#' + (Math.floor(t / c) * (st.ex.reps || 1) + 1);
+    }
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+addEventListener('resize', () => { stages.forEach(sizeCanvas); if (dlgStage) sizeCanvas(dlgStage); });
+
+/* ---------- Rest timer ---------- */
+let restEnd = 0, restTotal = 0, restIv = null;
+function startRest(sec, nextLabel) {
+  restTotal = sec; restEnd = Date.now() + sec * 1000;
+  $('restNext').textContent = nextLabel;
+  $('rest').hidden = false;
+  clearInterval(restIv); tickRest(); restIv = setInterval(tickRest, 250);
+}
+function tickRest() {
+  const left = Math.max(0, Math.ceil((restEnd - Date.now()) / 1000));
+  $('restT').textContent = left + 's';
+  $('restBar').style.width = (restTotal ? (1 - left / restTotal) * 100 : 100) + '%';
+  if (left <= 0) { stopRest(); toast('Hết giờ nghỉ, vào hiệp tiếp theo!'); try { navigator.vibrate && navigator.vibrate(200); } catch (e) {} }
+}
+function stopRest() { clearInterval(restIv); $('rest').hidden = true; }
+$('restSkip').onclick = stopRest;
+$('restAdd').onclick = () => { restEnd += 15000; restTotal += 15; tickRest(); };
+
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+
+/* ---------- Events ---------- */
+$('levels').addEventListener('click', e => {
+  const b = e.target.closest('.lv'); if (!b) return;
+  state.level = +b.dataset.lv; save(); renderAll();
+});
+$('days').addEventListener('click', e => {
+  const b = e.target.closest('.day'); if (!b) return;
+  selDay = +b.dataset.day; renderDays(); renderSession();
+});
+$('session').addEventListener('click', e => {
+  const set = e.target.closest('.set');
+  if (set) {
+    const i = +set.dataset.ex, k = +set.dataset.k, L = LV(state.level), d = L.days[selDay];
+    let entry = currentEntry();
+    if (!entry) { entry = { level: state.level, day: selDay, sets: {} }; state.log[todayKey()] = entry; }
+    const have = entry.sets[i] || 0;
+    entry.sets[i] = k < have ? k : k + 1;
+    entry.plan = d.x.map(a => a.slice());
+    const wasDone = entry.completedAt;
+    if (isDone(entry)) { if (!wasDone) entry.completedAt = new Date().toISOString(); } else delete entry.completedAt;
+    save();
+    const added = entry.sets[i] > have;
+    renderSession(); renderDays(); renderWeek(); renderCal();
+    if (isDone(entry) && !wasDone) { stopRest(); toast('Hoàn thành buổi tập! Đã tự điểm danh hôm nay.'); }
+    else if (added) {
+      const it = d.x[i], more = entry.sets[i] < it[1];
+      const nextIdx = more ? i : d.x.findIndex((x, j) => (entry.sets[j] || 0) < x[1]);
+      if (nextIdx >= 0) {
+        const nx = d.x[nextIdx];
+        startRest(more ? L.rest : Math.max(L.rest, 60), `Tiếp: ${X[nx[0]].vi} — hiệp ${(entry.sets[nextIdx] || 0) + 1}/${nx[1]}, ${nx[2]} ${UNIT[nx[3]]}`);
+      }
+    }
+    return;
+  }
+  if (editMode) return;
+  const op = e.target.closest('[data-open]');
+  if (op) openDlg(+op.dataset.open);
+});
+
+function openDlg(i) {
+  const it = LV(state.level).days[selDay].x[i], info = X[it[0]];
+  $('dlgName').textContent = info.vi;
+  $('dlgMuscle').textContent = info.en + ' · ' + info.m;
+  $('dlgDose').innerHTML = `${it[1]} × ${it[2]}<small>${UNIT[it[3]]}</small>`;
+  $('dlgSteps').innerHTML = info.steps.map(s => `<li>${esc(s)}</li>`).join('');
+  $('dlgTip').innerHTML = `<b>Lưu ý:</b> ${esc(info.tip)}`;
+  $('dlg').showModal();
+  dlgStage = { canvas: $('dlgCanvas'), cnt: $('dlgCnt'), ex: E[it[0]] };
+  sizeCanvas(dlgStage);
+}
+$('dlgClose').onclick = () => $('dlg').close();
+$('dlg').addEventListener('close', () => { dlgStage = null; });
+$('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
+document.querySelectorAll('[data-speed]').forEach(b => b.onclick = () => { speed = +b.dataset.speed; });
+
+$('playToggle').onclick = () => { playing = !playing; $('playToggle').textContent = playing ? '⏸ Dừng hình' : '▶ Chạy hình'; };
+$('playToggle').textContent = playing ? '⏸ Dừng hình' : '▶ Chạy hình';
+
+$('busyBtn').onclick = () => { schMode = 'week'; renderSched(); if (mq.matches) showPane('lich'); $('schedCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+$('checkinBtn').onclick = () => {
+  const k = todayKey(), e = state.log[k];
+  if (isDone(e)) { toast('Hôm nay đã điểm danh rồi.'); return; }
+  state.log[k] = Object.assign(e || { level: state.level, day: planFor(new Date()) ?? selDay, sets: {} }, { manual: true, completedAt: new Date().toISOString() });
+  save(); renderAll(); toast('Đã điểm danh hôm nay.');
+};
+$('week').addEventListener('click', e => {
+  const b = e.target.closest('.wd'); if (!b) return;
+  const k = b.dataset.date;
+  if (k > todayKey()) { toast('Chưa tới ngày này.'); return; }
+  const cur = state.log[k];
+  if (cur && cur.manual) { delete cur.manual; delete cur.completedAt; if (!setsDone(cur)) delete state.log[k]; toast('Đã bỏ điểm danh ' + k.split('-').reverse().slice(0, 2).join('/')); }
+  else if (isDone(cur)) { toast('Ngày này đã hoàn thành theo checklist.'); return; }
+  else { const dt = parseYmd(k); state.log[k] = Object.assign(cur || { level: state.level, day: planFor(dt) ?? 0, sets: {} }, { manual: true, completedAt: new Date().toISOString() }); toast('Đã điểm danh ' + k.split('-').reverse().slice(0, 2).join('/')); }
+  save(); renderAll();
+});
+$('cal').addEventListener('click', e => { const b = e.target.closest('.cd'); if (!b) return; calSel = b.dataset.date; renderDayLog(); });
+$('calPrev').onclick = () => { calRef.setMonth(calRef.getMonth() - 1); renderCal(); };
+$('calNext').onclick = () => { calRef.setMonth(calRef.getMonth() + 1); renderCal(); };
+$('resetToday').onclick = () => {
+  const b = $('resetToday');
+  if (b.dataset.armed) { delete state.log[todayKey()]; save(); renderAll(); b.textContent = 'Xoá checklist hôm nay'; delete b.dataset.armed; toast('Đã xoá tiến độ hôm nay.'); return; }
+  b.dataset.armed = '1'; b.textContent = 'Bấm lần nữa để xoá'; setTimeout(() => { b.textContent = 'Xoá checklist hôm nay'; delete b.dataset.armed; }, 3000);
+};
+
+/* ---------- Calendar export ---------- */
+function nextMonday() { const d = new Date(); d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); return d; }
+function stamp(d, hm) { const [h, m] = hm.split(':').map(Number); const x = new Date(d); x.setHours(h, m, 0, 0); return x; }
+const fmtLocal = d => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+function byDay() {
+  const codes = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'], sch = defaultSchedule();
+  const ds = Object.keys(sch).filter(k => sch[k] >= 0).map(Number).sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7));
+  return (ds.length ? ds : [1]).map(d => codes[d]).join(',');
+}
+function renderGcal() {
+  $('remindTime').value = state.remind || '18:30';
+  const st = stamp(nextMonday(), $('remindTime').value), en = new Date(st.getTime() + 45 * 60000);
+  const L = LV(state.level);
+  const sch = defaultSchedule();
+  const details = `Cấp độ: ${L.key}\n` + Object.keys(sch).filter(k => sch[k] >= 0).sort((a, b) => ((+a + 6) % 7) - ((+b + 6) % 7)).map(k => `${WEEKDAYS[k]}: ${L.days[sch[k]]?.n || ''}`).join('\n');
+  const u = new URL('https://calendar.google.com/calendar/render');
+  u.searchParams.set('action', 'TEMPLATE');
+  u.searchParams.set('text', 'HomeReps: tập ' + L.key);
+  u.searchParams.set('details', details);
+  u.searchParams.set('dates', fmtLocal(st) + '/' + fmtLocal(en));
+  u.searchParams.set('recur', 'RRULE:FREQ=WEEKLY;BYDAY=' + byDay());
+  u.searchParams.set('ctz', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Ho_Chi_Minh');
+  $('gcalLink').href = u.toString();
+}
+$('remindTime').addEventListener('change', () => { state.remind = $('remindTime').value; save(); renderGcal(); });
+function buildIcs() {
+  const st = stamp(nextMonday(), $('remindTime').value), en = new Date(st.getTime() + 45 * 60000);
+  const L = LV(state.level);
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//HomeReps//VI', 'BEGIN:VEVENT',
+    'UID:' + Date.now() + '@homereps', 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z',
+    'DTSTART:' + fmtLocal(st), 'DTEND:' + fmtLocal(en), 'RRULE:FREQ=WEEKLY;BYDAY=' + byDay(),
+    'SUMMARY:HomeReps: tập ' + L.key, 'DESCRIPTION:Khởi động 5 phút\\, 5-6 bài chính\\, giãn cơ 5 phút.',
+    'BEGIN:VALARM', 'TRIGGER:-PT15M', 'ACTION:DISPLAY', 'DESCRIPTION:Sắp tới giờ tập', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+}
+
+/* ---------- File export / import ---------- */
+let downloads = null;
+async function offerFile(name, text, mime) {
+  if (downloads) {
+    try { await downloads.save({ filename: name, data: text }); toast('Đã lưu ' + name); return true; }
+    catch (e) { if (e && e.code !== 'declined') toast('Không lưu được file ở đây (' + (e.code || 'lỗi') + ').'); return false; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: mime }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  return true;
+}
+function buildMd() {
+  const keys = Object.keys(state.log).sort();
+  const done = keys.filter(k => isDone(state.log[k]));
+  let md = `# HomeReps: nhật ký tập luyện\n\n- Xuất ngày: ${todayKey()}\n- Cấp độ hiện tại: ${LEVELS[state.level].key}\n- Tổng buổi hoàn thành: ${done.length}\n- Chuỗi hiện tại: ${streak()} buổi\n- Tổng số hiệp: ${Object.values(state.log).reduce((s, e) => s + setsDone(e), 0)}\n\n## Chi tiết\n\n`;
+  if (!keys.length) md += '_Chưa có buổi nào._\n';
+  keys.slice().reverse().forEach(k => {
+    const e = state.log[k], dt = parseYmd(k);
+    md += `### ${WEEKDAYS[dt.getDay()]} ${k.split('-').reverse().join('/')} — ${isDone(e) ? '✅ Hoàn thành' : '⏳ Tập dở'}\n\n`;
+    if (e.manual && !setsDone(e)) { md += '- Điểm danh tay\n\n'; return; }
+    const d = LV(e.level)?.days[e.day], px = planOf(e); if (!d || !px) return;
+    md += `${LEVELS[e.level].key} · ${d.n}\n\n| Bài | Mục tiêu | Đã làm |\n|---|---|---|\n`;
+    px.forEach((it, i) => { md += `| ${X[it[0]].vi} | ${it[1]} × ${it[2]} ${UNIT[it[3]]} | ${e.sets?.[i] || 0}/${it[1]} hiệp |\n`; });
+    md += '\n';
+  });
+  return md;
+}
+/* ---------- Backup: JSON export / import ---------- */
+const BACKUP_KEY = KEY + '-undo';
+function exportPayload() {
+  return JSON.stringify({ app: 'homereps', version: APP_VERSION, schema: state.version || 4, exportedAt: new Date().toISOString(), data: state }, null, 2);
+}
+function markExported() { state.lastExport = Date.now(); save(); renderBackup(); }
+function renderBackup() {
+  const box = $('backupInfo'); if (!box) return;
+  const keys = Object.keys(state.log);
+  const since = keys.filter(k => isDone(state.log[k]) && (!state.lastExport || (state.log[k].completedAt && Date.parse(state.log[k].completedAt) > state.lastExport))).length;
+  if (!state.lastExport) {
+    box.className = 'sch-sum' + (keys.length ? ' warn' : '');
+    box.textContent = keys.length ? `Chưa sao lưu lần nào. Có ${keys.length} ngày dữ liệu chỉ nằm trong trình duyệt này.` : 'Chưa có dữ liệu. Sau buổi tập đầu tiên, nhớ xuất .json một lần.';
+    return;
+  }
+  const d = new Date(state.lastExport), days = Math.floor((Date.now() - state.lastExport) / 864e5);
+  const old = days >= 7 && since > 0;
+  box.className = 'sch-sum' + (old ? ' warn' : ' good');
+  box.textContent = `Sao lưu gần nhất: ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} (${days === 0 ? 'hôm nay' : days + ' ngày trước'}).` +
+    (since ? ` Có ${since} buổi mới chưa sao lưu.` : ' Đã gồm mọi buổi.') + (old ? ' Nên xuất lại.' : '');
+}
+
+const okLevel = v => [0, 1, 2].includes(v);
+const okDate = k => /^\d{4}-\d{2}-\d{2}$/.test(k);
+function validCustom(c) {
+  return c && typeof c === 'object' && Object.keys(c).every(lv => okLevel(+lv)) && Object.values(c).every(days => Array.isArray(days) && days.length === 5 &&
+    days.every(d => d && typeof d.n === 'string' && Array.isArray(d.x) && d.x.length && d.x.every(it => Array.isArray(it) && X[it[0]] && it[1] > 0 && it[2] > 0 && UNIT[it[3]])));
+}
+// Accepts the exported envelope or a bare state object; returns a cleaned copy or throws with a readable reason.
+function parseBackup(text) {
+  let raw;
+  try { raw = JSON.parse(text.replace(/^﻿/, '')); } catch (e) { throw new Error('Nội dung không phải JSON hợp lệ.'); }
+  const d = raw && (raw.app === 'homereps' || raw.app === 'so-tap') && raw.data ? raw.data : raw;
+  if (!d || typeof d !== 'object' || !d.log || typeof d.log !== 'object' || Array.isArray(d.log)) throw new Error('Không thấy dữ liệu nhật ký (trường "log").');
+  const out = { log: {} };
+  Object.keys(d.log).forEach(k => {
+    const e = d.log[k];
+    if (okDate(k) && e && typeof e === 'object' && okLevel(e.level) && Number.isInteger(e.day) && e.day >= 0 && e.day < 5) {
+      out.log[k] = { level: e.level, day: e.day, sets: e.sets && typeof e.sets === 'object' ? e.sets : {} };
+      ['manual', 'completedAt', 'plan'].forEach(f => { if (e[f] !== undefined) out.log[k][f] = e[f]; });
+    }
+  });
+  if (okLevel(d.level)) out.level = d.level;
+  if (okLevel(d.intensity)) out.intensity = d.intensity;
+  if (d.goal >= 1 && d.goal <= 7) out.goal = d.goal;
+  if (typeof d.remind === 'string' && /^\d{2}:\d{2}$/.test(d.remind)) out.remind = d.remind;
+  if (d.rest && typeof d.rest === 'object') out.rest = d.rest;
+  if (d.schedule && typeof d.schedule === 'object') out.schedule = d.schedule;
+  if (d.weekPlan && typeof d.weekPlan === 'object') out.weekPlan = d.weekPlan;
+  if (validCustom(d.custom)) out.custom = d.custom;
+  if (d.lastExport) out.lastExport = d.lastExport;
+  out.exportedAt = raw.exportedAt || null;
+  return out;
+}
+
+let pending = null, pendingName = '';
+function showPreview(data, name) {
+  pending = data; pendingName = name;
+  const keys = Object.keys(data.log).sort(), fmtK = k => k.split('-').reverse().join('/');
+  const done = keys.filter(k => isDone(data.log[k])).length;
+  const cur = Object.keys(state.log).length;
+  const ex = data.exportedAt ? new Date(data.exportedAt) : null;
+  $('impPreview').hidden = false;
+  $('impPreview').className = 'sch-sum';
+  $('impPreview').innerHTML = `<b>${esc(name)}</b>${ex ? ` · xuất ngày ${ex.getDate()}/${ex.getMonth() + 1}/${ex.getFullYear()}` : ''}<br>
+    ${keys.length} ngày dữ liệu${keys.length ? ` (${fmtK(keys[0])} → ${fmtK(keys[keys.length - 1])})` : ''}, ${done} buổi hoàn thành.
+    ${data.custom ? 'Có giáo án tuỳ chỉnh. ' : ''}${data.schedule || data.weekPlan ? 'Có lịch tập riêng. ' : ''}${data.level !== undefined ? 'Cấp độ: ' + LEVELS[data.level].key + '.' : ''}<br>
+    <span class="muted">Trình duyệt này đang có ${cur} ngày dữ liệu.</span>
+    <div class="row">
+      <button class="btn pri sm" type="button" data-imp="merge">Gộp vào dữ liệu hiện có</button>
+      <button class="btn sm danger" type="button" data-imp="replace">Thay thế toàn bộ</button>
+      <button class="btn sm" type="button" data-imp="cancel">Huỷ</button>
+    </div>
+    <div class="note">Gộp: mỗi ngày giữ bản có nhiều hiệp hơn; cài đặt lấy theo file. Thay thế: xoá dữ liệu hiện tại, dùng đúng dữ liệu trong file.</div>`;
+  $('impPreview').scrollIntoView({ block: 'nearest' });
+}
+function readBackup(text, name) {
+  try { showPreview(parseBackup(text), name); $('pasteBox').hidden = true; }
+  catch (err) { $('impPreview').hidden = false; $('impPreview').className = 'sch-sum warn'; $('impPreview').textContent = `Không đọc được ${name}: ${err.message} Hãy dùng file .json xuất từ trang này.`; }
+}
+function applyImport(mode) {
+  const data = pending; if (!data) return;
+  try { localStorage.setItem(BACKUP_KEY, JSON.stringify(state)); } catch (e) {}
+  const settings = ['level', 'intensity', 'goal', 'remind', 'rest', 'schedule', 'weekPlan', 'custom'];
+  if (mode === 'replace') {
+    const fresh = { version: 4, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
+    state = Object.assign(fresh, data, { lastExport: state.lastExport });
+  } else {
+    Object.keys(data.log).forEach(k => {
+      const inc = data.log[k], cur = state.log[k];
+      if (!cur || isDone(inc) && !isDone(cur) || setsDone(inc) > setsDone(cur)) state.log[k] = inc;
+    });
+    settings.forEach(f => { if (data[f] !== undefined) state[f] = data[f]; });
+  }
+  delete state.exportedAt;
+  const n = Object.keys(data.log).length;
+  pending = null; $('impPreview').hidden = true; $('undoRow').hidden = false;
+  save(); selDay = planFor(new Date()) ?? 0; renderAll(); renderBackup();
+  toast(`${mode === 'replace' ? 'Đã thay thế bằng' : 'Đã gộp'} ${n} ngày từ ${pendingName}.`);
+}
+
+$('expJson').onclick = async () => { if (await offerFile(`homereps-${todayKey()}.json`, exportPayload(), 'application/json')) markExported(); };
+$('expMd').onclick = () => offerFile(`homereps-${todayKey()}.md`, buildMd(), 'text/markdown');
+$('icsBtn').onclick = () => offerFile('lich-tap.ics', buildIcs(), 'text/calendar');
+$('copyJson').onclick = () => {
+  const text = exportPayload();
+  const fallback = () => { $('pasteBox').hidden = false; $('pasteText').value = text; $('pasteText').select(); toast('Không sao chép tự động được. Nội dung đã được chọn sẵn, nhấn Ctrl/⌘+C.'); };
+  try {
+    navigator.clipboard.writeText(text).then(() => { markExported(); toast('Đã sao chép JSON. Dán vào ghi chú hoặc tin nhắn để lưu.'); }, fallback);
+  } catch (e) { fallback(); }
+};
+$('pasteBtn').onclick = () => { $('pasteBox').hidden = false; $('pasteText').value = ''; $('pasteText').focus(); };
+$('pasteCancel').onclick = () => { $('pasteBox').hidden = true; };
+$('pasteRead').onclick = () => { const t = $('pasteText').value.trim(); if (!t) { toast('Chưa có nội dung để đọc.'); return; } readBackup(t, 'nội dung dán'); };
+$('impFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  readBackup(await f.text(), f.name);
+  e.target.value = '';
+});
+$('impPreview').addEventListener('click', e => {
+  const b = e.target.closest('[data-imp]'); if (!b) return;
+  if (b.dataset.imp === 'cancel') { pending = null; $('impPreview').hidden = true; return; }
+  if (b.dataset.imp === 'replace' && !b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Bấm lần nữa để thay thế'; return; }
+  applyImport(b.dataset.imp);
+});
+$('undoImport').onclick = () => {
+  let prev = null;
+  try { prev = JSON.parse(localStorage.getItem(BACKUP_KEY)); } catch (e) {}
+  if (!prev) { toast('Không còn bản trước để hoàn tác.'); return; }
+  state = prev; save(); try { localStorage.removeItem(BACKUP_KEY); } catch (e) {}
+  $('undoRow').hidden = true; renderAll(); renderBackup(); toast('Đã hoàn tác, dữ liệu trở lại như trước khi nhập.');
+};
+renderBackup();
+$('appVer').textContent = APP_VERSION;
+
+const mq = matchMedia('(max-width: 760px)');
+let pane = 'tap';
+try { pane = localStorage.getItem('homereps-pane') || 'tap'; } catch (e) {}
+function showPane(p) {
+  pane = p;
+  document.querySelectorAll('[data-pane]').forEach(el => el.classList.toggle('on', !mq.matches || el.dataset.pane === p));
+  document.querySelectorAll('#mnav [data-go]').forEach(b => b.setAttribute('aria-current', b.dataset.go === p));
+  try { localStorage.setItem('homereps-pane', p); } catch (e) {}
+  if (p === 'tap') requestAnimationFrame(() => stages.forEach(sizeCanvas));
+}
+$('mnav').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) { showPane(b.dataset.go); scrollTo(0, 0); } });
+mq.addEventListener('change', () => showPane(pane));
+const _rw = renderWeek;
+renderWeek = function () { _rw(); const n = weekDates().filter(dt => isDone(state.log[ymd(dt)])).length; $('navBadge').hidden = !n; $('navBadge').textContent = n; };
+renderAll();
+showPane(pane);
+
+/* ---------- Training days ---------- */
+var schMode = 'week';
+function sessionOptions(cur, withBusy) {
+  const L = LV(state.level);
+  let h = withBusy ? `<option value="${BUSY}"${cur === BUSY ? ' selected' : ''}>Bận, không tập</option>` : '';
+  h += `<option value="${OFF}"${cur === OFF || cur === undefined ? ' selected' : ''}>Nghỉ</option>`;
+  L.days.forEach((d, i) => { h += `<option value="${i}"${cur === i ? ' selected' : ''}>Buổi ${i + 1}: ${esc(d.n)}${d.opt ? ' (tuỳ chọn)' : ''}</option>`; });
+  return h;
+}
+function weekOverride(create) {
+  const k = mondayKey(new Date());
+  state.weekPlan = state.weekPlan || {};
+  if (!state.weekPlan[k] && create) {
+    const o = {}; weekDates().forEach(dt => { const v = defaultSchedule()[dt.getDay()]; o[dt.getDay()] = v === undefined ? OFF : v; });
+    state.weekPlan[k] = o;
+  }
+  return state.weekPlan[k];
+}
+function weekSummary() {
+  const wk = weekDates(), t = todayKey();
+  const done = wk.filter(dt => isDone(state.log[ymd(dt)])).length;
+  const left = wk.filter(dt => ymd(dt) >= t && planFor(dt) !== undefined && !isDone(state.log[ymd(dt)])).length;
+  return { done, left, total: done + left, goal: weekGoal() };
+}
+// Re-place this week's unfinished sessions on the free days from today on, spread out, avoiding busy days.
+function reflowWeek() {
+  const o = weekOverride(true), wk = weekDates(), t = todayKey(), L = LV(state.level);
+  const doneDays = wk.filter(dt => isDone(state.log[ymd(dt)]));
+  const doneIdx = new Set(doneDays.map(dt => state.log[ymd(dt)].day));
+  const locked = dt => ymd(dt) < t || isDone(state.log[ymd(dt)]) || (ymd(dt) === t && setsDone(state.log[t]) > 0);
+  const lockedPlanned = wk.filter(dt => locked(dt) && !isDone(state.log[ymd(dt)]) && ymd(dt) >= t && planFor(dt) !== undefined).length;
+  const need = Math.max(0, weekGoal() - doneDays.length - lockedPlanned);
+  const order = L.days.map((d, i) => i).filter(i => !doneIdx.has(i)).sort((a, b) => (L.days[a].opt ? 1 : 0) - (L.days[b].opt ? 1 : 0));
+  while (order.length < need) order.push(order.length % L.days.length);
+  const free = wk.filter(dt => !locked(dt) && o[dt.getDay()] !== BUSY);
+  const before = {}; wk.forEach(dt => { before[dt.getDay()] = planFor(dt); });
+  free.forEach(dt => { o[dt.getDay()] = OFF; });
+  const n = Math.min(need, free.length);
+  for (let j = 0; j < n; j++) {
+    const dt = free[n === free.length ? j : Math.round(j * (free.length - 1) / Math.max(1, n - 1))];
+    o[dt.getDay()] = order[j];
+  }
+  const moved = wk.filter(dt => before[dt.getDay()] !== planFor(dt) && planFor(dt) !== undefined).map(dt => WEEKDAYS[dt.getDay()]);
+  save();
+  return { short: need - n, moved };
+}
+function renderSched() {
+  $('goalVal').textContent = weekGoal();
+  document.querySelectorAll('[data-sm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sm === schMode));
+  const t = todayKey();
+  if (schMode === 'def') {
+    const sch = defaultSchedule();
+    $('sch').innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => `<div class="sch-row"><span class="dn">${WEEKDAYS[d]}</span>
+      <select data-def="${d}" aria-label="Lịch mặc định ${WEEKDAYS[d]}">${sessionOptions(sch[d] === undefined ? OFF : sch[d], false)}</select><span></span></div>`).join('');
+    const n = Object.values(sch).filter(v => v >= 0).length;
+    $('schSum').className = 'sch-sum' + (n < weekGoal() ? ' warn' : '');
+    $('schSum').textContent = `Lịch mặc định có ${n} buổi/tuần, áp dụng cho mọi tuần chưa chỉnh riêng.` + (n < weekGoal() ? ` Ít hơn mục tiêu ${weekGoal()} buổi.` : '');
+    $('schActions').innerHTML = `<button class="btn sm" type="button" id="schResetDef">Về lịch gốc (T2 T3 T5 T6 T7)</button>`;
+    return;
+  }
+  const wk = weekDates(), o = state.weekPlan && state.weekPlan[mondayKey(new Date())];
+  $('sch').innerHTML = wk.map(dt => {
+    const k = ymd(dt), e = state.log[k], past = k < t, done = isDone(e);
+    const cur = o && o[dt.getDay()] !== undefined ? o[dt.getDay()] : (defaultSchedule()[dt.getDay()] ?? OFF);
+    const def = defaultSchedule()[dt.getDay()] ?? OFF;
+    const tag = done ? '<span class="tag ok">✓ Đã tập</span>' : (cur !== def && cur >= 0 ? '<span class="tag mv">Dời tới</span>' : '');
+    return `<div class="sch-row${k === t ? ' today' : ''}${cur === BUSY ? ' busy' : ''}${past ? ' past' : ''}">
+      <span class="dn">${WEEKDAYS[dt.getDay()]}<small>${dt.getDate()}/${dt.getMonth() + 1}${k === t ? ' · nay' : ''}</small></span>
+      <select data-wk="${dt.getDay()}" aria-label="Tuần này ${WEEKDAYS[dt.getDay()]}"${past || done ? ' disabled' : ''}>${sessionOptions(cur, true)}</select>${tag}</div>`;
+  }).join('');
+  const sm = weekSummary();
+  const ok = sm.total >= sm.goal;
+  $('schSum').className = 'sch-sum ' + (sm.done >= sm.goal ? 'good' : ok ? '' : 'warn');
+  $('schSum').textContent = sm.done >= sm.goal ? `Đã đạt mục tiêu tuần: ${sm.done}/${sm.goal} buổi.`
+    : ok ? `Đã tập ${sm.done}, còn ${sm.left} buổi đã xếp. Đủ mục tiêu ${sm.goal} buổi nếu tập đúng lịch.`
+    : `Đã tập ${sm.done}, còn ${sm.left} buổi đã xếp. Thiếu ${sm.goal - sm.total} buổi so với mục tiêu. Bấm “Dồn lịch” để xếp vào ngày trống.`;
+  $('schActions').innerHTML = `<button class="btn pri sm" type="button" id="schReflow">⇄ Dồn lịch đủ ${sm.goal} buổi</button>` +
+    (o ? `<button class="btn sm" type="button" id="schClear">Bỏ chỉnh tuần này</button>` : '');
+}
+function afterSched(msg) {
+  const p = planFor(new Date());
+  if (p !== undefined && !currentEntry()) selDay = p;
+  renderSched(); renderDays(); renderSession(); renderWeek(); renderCal(); renderGcal();
+  if (msg) toast(msg);
+}
+$('schedCard').addEventListener('click', e => {
+  const m = e.target.closest('[data-sm]'); if (m) { schMode = m.dataset.sm; renderSched(); return; }
+  if (e.target.closest('#goalMinus') || e.target.closest('#goalPlus')) {
+    state.goal = Math.min(7, Math.max(1, weekGoal() + (e.target.closest('#goalPlus') ? 1 : -1))); save(); afterSched(); return;
+  }
+  if (e.target.closest('#schReflow')) {
+    const r = reflowWeek();
+    afterSched(r.short > 0 ? `Không đủ ngày trống, còn thiếu ${r.short} buổi. Bỏ bớt ngày bận hoặc giảm mục tiêu.` : r.moved.length ? 'Đã xếp lại: ' + r.moved.join(', ') : 'Lịch tuần này đã ổn.');
+    return;
+  }
+  if (e.target.closest('#schClear')) { delete state.weekPlan[mondayKey(new Date())]; save(); afterSched('Tuần này dùng lại lịch mặc định.'); return; }
+  if (e.target.closest('#schResetDef')) { delete state.schedule; save(); afterSched('Đã về lịch gốc.'); }
+});
+$('schedCard').addEventListener('change', e => {
+  const sel = e.target;
+  if (sel.dataset.def !== undefined) {
+    state.schedule = Object.assign({}, defaultSchedule());
+    const v = +sel.value; if (v < 0) delete state.schedule[sel.dataset.def]; else state.schedule[sel.dataset.def] = v;
+    save(); afterSched(); return;
+  }
+  if (sel.dataset.wk !== undefined) {
+    const o = weekOverride(true), d = +sel.dataset.wk, v = +sel.value, had = o[d];
+    o[d] = v; save();
+    if (v === BUSY && had >= 0) { const r = reflowWeek(); afterSched(r.short > 0 ? `Đã đánh dấu bận. Không còn đủ ngày, thiếu ${r.short} buổi.` : `Đã đánh dấu bận, dời buổi sang ${r.moved.join(', ') || 'ngày trống'}.`); }
+    else afterSched();
+  }
+});
+
+/* ---------- Program editor ---------- */
+var editMode = false;
+function editHead(L, d) {
+  const I = INTENSITY[state.intensity ?? 1];
+  return `<div class="edit-head">
+    <label class="f" for="dayName">Tên buổi<input id="dayName" type="text" maxlength="40" value="${esc(d.n)}"></label>
+    <div style="display:grid;gap:3px"><span class="seg-l">Nghỉ giữa hiệp</span>
+      <span class="stp"><button type="button" data-act="rest-" aria-label="Giảm nghỉ">−</button><b class="num">${L.baseRest}</b><span>giây</span><button type="button" data-act="rest+" aria-label="Tăng nghỉ">+</button></span></div>
+    <span class="grow" style="flex:1"></span>
+    <button class="btn sm danger" type="button" id="resetDay">Khôi phục mặc định</button>
+    <button class="btn pri" type="button" id="editDone">✓ Xong</button>
+    ${I.f !== 1 ? `<div class="hint" style="flex-basis:100%">Đang ở cường độ ${I.k}: số bên dưới là gốc, khi tập sẽ thành ×${I.f} và nghỉ ${L.rest}s.</div>` : ''}
+  </div>`;
+}
+function editRows(d) {
+  const raw = rawDays(state.level)[selDay];
+  return raw.x.map((it, i) => {
+    const [id, sets, amt, u] = it, info = X[id], eff = d.x[i][2];
+    return `<div class="ex edit" data-i="${i}">
+      <div class="idx num">${i + 1}</div>
+      <button class="stage" type="button" data-act="swap" aria-label="Đổi bài ${esc(info.vi)}"><canvas></canvas><span class="cnt">⇄ Đổi</span></button>
+      <div class="ex-body">
+        <div class="ex-name"><h3>${esc(info.vi)}</h3><span class="en">${esc(info.m)}</span></div>
+        <div class="ed-row">
+          <span class="stp"><button type="button" data-act="sets-" aria-label="Bớt hiệp">−</button><b class="num">${sets}</b><span>hiệp</span><button type="button" data-act="sets+" aria-label="Thêm hiệp">+</button></span>
+          <span class="stp"><button type="button" data-act="amt-" aria-label="Giảm">−</button><b class="num">${amt}</b><button type="button" data-act="amt+" aria-label="Tăng">+</button></span>
+          <select data-act="unit" aria-label="Đơn vị">${Object.keys(UNIT).map(k => `<option value="${k}"${k === u ? ' selected' : ''}>${UNIT[k]}</option>`).join('')}</select>
+          ${eff !== amt ? `<span class="hint">→ ${eff}</span>` : ''}
+        </div>
+        <div class="ed-row">
+          <button class="btn sm" type="button" data-act="swap">⇄ Đổi bài</button>
+          <button class="btn sm" type="button" data-act="up" aria-label="Lên"${i === 0 ? ' disabled' : ''}>↑</button>
+          <button class="btn sm" type="button" data-act="down" aria-label="Xuống"${i === raw.x.length - 1 ? ' disabled' : ''}>↓</button>
+          <button class="btn sm danger" type="button" data-act="del"${raw.x.length <= 1 ? ' disabled' : ''}>Xoá</button>
+        </div>
+      </div></div>`;
+  }).join('') + `<div class="add-row"><button class="btn" type="button" data-act="add">＋ Thêm bài</button><span class="muted">Thay đổi chỉ áp dụng cho cấp ${LEVELS[state.level].key}, lưu vào file .json khi xuất.</span></div>`;
+}
+function ensureCustom(lv) {
+  state.custom = state.custom || {};
+  if (!state.custom[lv]) state.custom[lv] = JSON.parse(JSON.stringify(LEVELS[lv].days));
+  return state.custom[lv];
+}
+// Apply an edit to the selected day and carry today's ticked sets over by exercise id.
+function editDay(fn) {
+  const before = LV(state.level).days[selDay].x, entry = currentEntry();
+  fn(ensureCustom(state.level)[selDay]);
+  const after = LV(state.level).days[selDay].x;
+  if (entry) {
+    const used = new Set(), sets = {};
+    after.forEach((it, j) => {
+      const oi = before.findIndex((b, k) => b[0] === it[0] && !used.has(k));
+      if (oi >= 0) { used.add(oi); if (entry.sets[oi]) sets[j] = Math.min(entry.sets[oi], it[1]); }
+    });
+    entry.sets = sets; entry.plan = after.map(a => a.slice());
+    if (isDone(entry)) entry.completedAt = entry.completedAt || new Date().toISOString(); else delete entry.completedAt;
+  }
+  save(); renderSession(); renderDays(); renderWeek(); renderCal();
+}
+function stepAmt(it, dir) {
+  const st = isTime(it[3]) ? 5 : 1;
+  it[2] = Math.min(isTime(it[3]) ? 600 : 200, Math.max(st, it[2] + dir * st));
+}
+$('session').addEventListener('click', e => {
+  const intB = e.target.closest('[data-int]');
+  if (intB) { state.intensity = +intB.dataset.int; save(); renderSession(); toast('Cường độ: ' + INTENSITY[state.intensity].k + '. ' + INTENSITY[state.intensity].d); return; }
+  if (e.target.closest('#editBtn')) { editMode = true; renderSession(); return; }
+  if (e.target.closest('#editDone')) { editMode = false; renderSession(); toast('Đã lưu giáo án.'); return; }
+  const rb = e.target.closest('#resetDay');
+  if (rb) {
+    if (!rb.dataset.armed) { rb.dataset.armed = '1'; rb.textContent = 'Bấm lần nữa để khôi phục'; setTimeout(() => { if (rb.isConnected) { rb.textContent = 'Khôi phục mặc định'; delete rb.dataset.armed; } }, 3000); return; }
+    editDay(day => { const def = LEVELS[state.level].days[selDay]; day.n = def.n; day.x = JSON.parse(JSON.stringify(def.x)); });
+    toast('Đã khôi phục buổi về mặc định.'); return;
+  }
+  const act = e.target.closest('[data-act]'); if (!act || !editMode) return;
+  const a = act.dataset.act, row = act.closest('.ex'), i = row ? +row.dataset.i : -1;
+  if (a === 'unit') return;
+  if (a === 'rest-' || a === 'rest+') {
+    state.rest = state.rest || {};
+    const cur = LV(state.level).baseRest;
+    state.rest[state.level] = Math.min(180, Math.max(15, cur + (a === 'rest+' ? 15 : -15)));
+    save(); renderSession(); return;
+  }
+  if (a === 'swap') { openPicker(i); return; }
+  if (a === 'add') { openPicker(-1); return; }
+  editDay(day => {
+    const it = day.x[i];
+    if (a === 'sets-') it[1] = Math.max(1, it[1] - 1);
+    if (a === 'sets+') it[1] = Math.min(8, it[1] + 1);
+    if (a === 'amt-') stepAmt(it, -1);
+    if (a === 'amt+') stepAmt(it, 1);
+    if (a === 'up' && i > 0) day.x.splice(i - 1, 0, day.x.splice(i, 1)[0]);
+    if (a === 'down' && i < day.x.length - 1) day.x.splice(i + 1, 0, day.x.splice(i, 1)[0]);
+    if (a === 'del' && day.x.length > 1) day.x.splice(i, 1);
+  });
+});
+$('session').addEventListener('change', e => {
+  if (e.target.id === 'dayName') { const v = e.target.value.trim(); if (v) editDay(day => { day.n = v; }); return; }
+  if (e.target.dataset.act === 'unit') {
+    const i = +e.target.closest('.ex').dataset.i, u = e.target.value;
+    editDay(day => { const it = day.x[i]; if (isTime(u) !== isTime(it[3])) it[2] = isTime(u) ? 30 : 10; it[3] = u; });
+  }
+});
+
+let pickIdx = -1;
+function openPicker(i) {
+  pickIdx = i;
+  const raw = rawDays(state.level)[selDay], cur = i >= 0 ? raw.x[i][0] : null;
+  const order = GROUPS.slice();
+  if (cur) { const gi = order.findIndex(g => g[1].includes(cur)); if (gi > 0) order.unshift(order.splice(gi, 1)[0]); }
+  $('pkBody').innerHTML = `<h3>${cur ? 'Đổi “' + esc(X[cur].vi) + '”' : 'Thêm bài vào buổi'}</h3>` +
+    order.map(([g, ids], gi) => `<section><h4>${esc(g)}${cur && gi === 0 ? ' · cùng nhóm cơ' : ''}</h4><div class="pk-grid">${ids.map(id =>
+      `<button type="button" class="pk-item${id === cur ? ' cur' : ''}" data-pick="${id}"><canvas data-fig="${id}"></canvas><b>${esc(X[id].vi)}</b><small>${esc(X[id].m)}</small></button>`).join('')}</div></section>`).join('');
+  $('picker').showModal();
+  requestAnimationFrame(() => {
+    $('pkBody').querySelectorAll('canvas[data-fig]').forEach(cv => {
+      const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+      const ex = E[cv.dataset.fig];
+      drawFigure(cv.getContext('2d'), ex, cycleLen(ex) * .45, colors, cv.width / 200);
+    });
+  });
+}
+$('pkClose').onclick = () => $('picker').close();
+$('picker').addEventListener('click', e => {
+  if (e.target === $('picker')) { $('picker').close(); return; }
+  const b = e.target.closest('[data-pick]'); if (!b) return;
+  const id = b.dataset.pick;
+  editDay(day => {
+    if (pickIdx < 0) { const [amt, u] = defDose(id); day.x.push([id, 3, amt, u]); return; }
+    const it = day.x[pickIdx], [amt, u] = defDose(id);
+    if (isTime(u) !== isTime(it[3])) { it[2] = amt; it[3] = u; }
+    else if ((u === 'b' || u === 'sb') !== (it[3] === 'b' || it[3] === 'sb')) it[3] = u;
+    it[0] = id;
+  });
+  $('picker').close();
+  toast(pickIdx < 0 ? 'Đã thêm ' + X[id].vi : 'Đã đổi sang ' + X[id].vi);
+});
+
+/* ---------- Guided player ---------- */
+const pl = { steps: [], i: 0, end: 0, left: 0, paused: false, iv: null, running: false };
+let audioCtx = null;
+function beep(f, d) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = f || 880; o.connect(g); g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(.18, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + (d || .18));
+    o.start(); o.stop(audioCtx.currentTime + (d || .18));
+  } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate(120); } catch (e) {}
+}
+function buildSteps() {
+  const L = LV(state.level), d = L.days[selDay], entry = currentEntry();
+  const fresh = !entry || isDone(entry);
+  const steps = [];
+  if (fresh || setsDone(entry) === 0) steps.push({ type: 'warm', sec: 300 });
+  const sets = [];
+  d.x.forEach((it, i) => { const have = fresh ? 0 : (entry.sets?.[i] || 0); for (let k = have; k < it[1]; k++) sets.push({ i, k }); });
+  sets.forEach((st, n) => {
+    steps.push({ type: 'set', i: st.i, k: st.k });
+    if (n < sets.length - 1) steps.push({ type: 'rest', sec: sets[n + 1].i === st.i ? L.rest : Math.max(L.rest, 60), nextI: sets[n + 1].i, nextK: sets[n + 1].k });
+  });
+  steps.push({ type: 'cool', sec: 300 });
+  steps.push({ type: 'done' });
+  return { steps, fresh };
+}
+function setSec(it) { const u = it[3]; return u === 's' ? it[2] : u === 'sb' ? it[2] * 2 + 5 : 0; }
+function startPlayer() {
+  const b = buildSteps();
+  if (b.fresh && currentEntry()) { delete state.log[todayKey()]; save(); }
+  pl.steps = b.steps; pl.i = 0; pl.paused = false;
+  $('player').showModal();
+  plStage = { canvas: $('plCanvas'), cnt: $('plCnt'), ex: E.march };
+  enterStep();
+  requestAnimationFrame(() => sizeCanvas(plStage));
+  clearInterval(pl.iv); pl.iv = setInterval(plTick, 200);
+}
+function enterStep() {
+  const st = pl.steps[pl.i], L = LV(state.level), d = L.days[selDay];
+  pl.paused = false; $('plPause').textContent = '⏸ Dừng'; plClock = 0;
+  const timed = st.type === 'warm' || st.type === 'cool' || st.type === 'rest' || (st.type === 'set' && setSec(d.x[st.i]) > 0);
+  pl.left = timed ? (st.type === 'set' ? setSec(d.x[st.i]) : st.sec) : 0;
+  pl.running = timed && st.type !== 'set';
+  pl.end = Date.now() + pl.left * 1000;
+  $('plSteps').innerHTML = pl.steps.slice(0, -1).map((x, j) => x.type === 'rest' ? '' : `<i class="${j < pl.i ? 'd' : j === pl.i ? 'c' : ''}"></i>`).join('');
+  const kind = $('plKind'); kind.className = 'pl-kind' + (st.type === 'rest' ? ' rest' : '');
+  $('plStageBox').hidden = st.type === 'done';
+  $('plNext').className = 'go';
+  const exCount = d.x.length;
+  if (st.type === 'warm' || st.type === 'cool') {
+    plStage.ex = st.type === 'warm' ? E.jumpingjack : E.plank;
+    kind.textContent = st.type === 'warm' ? 'Khởi động' : 'Giãn cơ';
+    $('plName').textContent = st.type === 'warm' ? 'Làm nóng cơ thể' : 'Thả lỏng';
+    $('plSub').textContent = st.type === 'warm' ? WARMUP : COOLDOWN;
+    $('plWhere').textContent = st.type === 'warm' ? 'Bước đầu' : 'Bước cuối';
+    $('plNext').textContent = 'Bỏ qua ›';
+  } else if (st.type === 'set') {
+    const it = d.x[st.i], info = X[it[0]];
+    plStage.ex = E[it[0]];
+    kind.textContent = `Bài ${st.i + 1}/${exCount} · Hiệp ${st.k + 1}/${it[1]}`;
+    $('plName').textContent = info.vi;
+    $('plSub').textContent = info.tip;
+    $('plWhere').textContent = `${d.n} · ${L.key}`;
+    if (setSec(it)) { $('plNext').textContent = '▶ Bắt đầu đếm'; }
+    else { $('plBig').innerHTML = `${it[2]}<small>${UNIT[it[3]]}</small>`; $('plNext').textContent = '✓ Xong hiệp'; $('plNext').className = 'go good'; }
+  } else if (st.type === 'rest') {
+    const nx = d.x[st.nextI];
+    plStage.ex = E[nx[0]];
+    kind.textContent = 'Nghỉ';
+    $('plName').textContent = 'Tiếp: ' + X[nx[0]].vi;
+    $('plSub').textContent = `Hiệp ${st.nextK + 1}/${nx[1]} · ${nx[2]} ${UNIT[nx[3]]}. Hít thở sâu, uống ngụm nước.`;
+    $('plNext').textContent = 'Bỏ qua nghỉ ›';
+  } else {
+    kind.textContent = 'Hoàn thành';
+    $('plName').textContent = 'Xong buổi tập!';
+    const e = state.log[todayKey()];
+    $('plBig').innerHTML = `${setsDone(e)}<small>hiệp</small>`;
+    $('plSub').textContent = `Đã điểm danh hôm nay. Chuỗi hiện tại: ${streak()} buổi.`;
+    $('plNext').textContent = 'Đóng'; $('plNext').className = 'go good';
+    beep(660, .15); setTimeout(() => beep(990, .3), 180);
+  }
+  $('plPrev').disabled = pl.i === 0;
+  plTick();
+}
+function fmt(sec) { sec = Math.max(0, Math.ceil(sec)); return sec >= 60 ? Math.floor(sec / 60) + ':' + pad(sec % 60) : sec + 's'; }
+function plTick() {
+  const st = pl.steps[pl.i]; if (!st || st.type === 'done') return;
+  const d = LV(state.level).days[selDay];
+  if (st.type === 'set' && !setSec(d.x[st.i])) return;
+  if (pl.running && !pl.paused) pl.left = (pl.end - Date.now()) / 1000;
+  $('plBig').textContent = fmt(pl.left);
+  if (pl.running && !pl.paused && pl.left <= 3.2 && pl.left > 0 && Math.ceil(pl.left) !== pl.lastBeep) { pl.lastBeep = Math.ceil(pl.left); beep(660, .08); }
+  if (pl.running && !pl.paused && pl.left <= 0) { pl.running = false; beep(990, .3); plAdvance(); }
+}
+function plAdvance() {
+  const st = pl.steps[pl.i];
+  if (st.type === 'done') { $('player').close(); return; }
+  if (st.type === 'set') tickSet(st.i);
+  pl.i = Math.min(pl.i + 1, pl.steps.length - 1);
+  enterStep();
+}
+function tickSet(i) {
+  let entry = currentEntry();
+  if (!entry) { entry = { level: state.level, day: selDay, sets: {} }; state.log[todayKey()] = entry; }
+  const max = LV(state.level).days[selDay].x[i][1];
+  entry.sets[i] = Math.min((entry.sets[i] || 0) + 1, max);
+  entry.plan = LV(state.level).days[selDay].x.map(a => a.slice());
+  if (isDone(entry) && !entry.completedAt) entry.completedAt = new Date().toISOString();
+  save(); renderSession(); renderDays(); renderWeek(); renderCal();
+}
+$('plNext').onclick = () => {
+  const st = pl.steps[pl.i], d = LV(state.level).days[selDay];
+  if (st.type === 'set' && setSec(d.x[st.i]) && !pl.running) {
+    pl.running = true; pl.paused = false; pl.end = Date.now() + pl.left * 1000; beep(880, .12);
+    $('plNext').textContent = 'Xong sớm ›'; return;
+  }
+  plAdvance();
+};
+$('plPrev').onclick = () => {
+  if (pl.i === 0) return;
+  let j = pl.i - 1;
+  if (pl.steps[j].type === 'rest') j--;
+  const st = pl.steps[j];
+  if (st && st.type === 'set') { const e = currentEntry(); if (e && e.sets[st.i] > st.k) { e.sets[st.i] = st.k; delete e.completedAt; save(); renderSession(); renderWeek(); renderCal(); } }
+  pl.i = Math.max(0, j); enterStep();
+};
+$('plPause').onclick = () => {
+  pl.paused = !pl.paused;
+  if (!pl.paused) pl.end = Date.now() + pl.left * 1000;
+  $('plPause').textContent = pl.paused ? '▶ Chạy tiếp' : '⏸ Dừng';
+};
+$('plClose').onclick = () => $('player').close();
+$('player').addEventListener('close', () => { clearInterval(pl.iv); plStage = null; stopRest(); renderAll(); });
+document.addEventListener('click', e => { if (e.target.closest('#startBtn')) { stopRest(); startPlayer(); } });
+addEventListener('resize', () => { if (plStage) sizeCanvas(plStage); });
+
+/* ---------- Offline + durable storage (GitHub Pages / any static host) ---------- */
+if (location.protocol.startsWith('http') && 'serviceWorker' in navigator && !window.claude) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+
+/* ---------- Optional: sync with claude.ai account ---------- */
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  const [db, user, dl] = await Promise.all([claude.use('db'), claude.use('user'), claude.use('downloads')]);
+  downloads = dl;
+  if (!db || !user) return;
+  const id = await user.id(); if (!id) return;
+  const ref = db.doc('data/users/' + id + '/progress');
+  try {
+    const snap = await ref.get();
+    if (snap.exists) {
+      const d = snap.data();
+      if (d && d.updatedAt > (state.updatedAt || 0)) { state = Object.assign(state, JSON.parse(d.json)); try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} renderAll(); }
+    }
+    cloud = ref;
+    syncNote('Tiến độ được lưu vào tài khoản của bạn, mở trên máy khác vẫn còn.');
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
