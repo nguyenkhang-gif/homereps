@@ -54,17 +54,25 @@ jobs:
           sed -i "s/__APP_VERSION__/$TAG/g" dist/homereps/index.html dist/homereps/sw.js
           (cd dist && zip -qr "homereps-$TAG.zip" homereps)
 
-      - name: Create tag and GitHub Release
+      # Pages skips a deployment for a commit it already deployed, so each release gets its own commit.
+      - name: Create release commit and tag
+        env:
+          TAG: ${{ steps.v.outputs.tag }}
+        run: |
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit --allow-empty -m "Release $TAG"
+          git tag "$TAG"
+          git push origin "HEAD:${GITHUB_REF_NAME}" "$TAG"
+
+      - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
           NOTES: ${{ inputs.notes }}
         run: |
-          git tag "$TAG"
-          git push origin "$TAG"
           gh release create "$TAG" "dist/homereps-$TAG.zip" --title "HomeReps $TAG" --generate-notes --notes "$NOTES"
 
       - name: Redeploy site so it shows the new version
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main
+        run: gh workflow run pages.yml --ref "$GITHUB_REF_NAME"
