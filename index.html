@@ -242,7 +242,7 @@ dialog::backdrop { background: rgba(10,12,10,.55); }
   .set { min-height: 40px; min-width: 76px; justify-content: center; font-size: .82rem; }
   .set .bx { width: 18px; height: 18px; }
   .day { min-width: 104px; padding: 9px 12px; }
-  .mnav { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 55; margin: 0; border-bottom: 0;
+  .mnav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 55; margin: 0; border-bottom: 0;
     background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
   .mnav button { border: 0; background: transparent; display: grid; justify-items: center; gap: 2px; padding: 6px 0; box-shadow: none; font-size: .7rem; font-weight: 600; color: var(--ink-2); border-radius: 10px; position: relative; }
   .mnav button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -352,6 +352,49 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
 .ms-table th, .ms-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); }
 .ms-table th { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); font-weight: 600; }
 .ms-table td.r, .ms-table th.r { text-align: right; }
+
+.chip.go { cursor: pointer; }
+.chip.go:hover { border-color: var(--ink-2); }
+.bm-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.bm-tile { background: var(--panel-2); border-radius: 9px; padding: 9px 11px; min-width: 0; }
+.bm-tile .v { font-family: var(--display); font-weight: 700; font-size: 1.7rem; line-height: 1; }
+.bm-tile .v small { font-family: var(--body); font-size: .72rem; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+.bm-tile .l { font-size: .68rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; margin-top: 3px; }
+.bm-tile .d { font-size: .74rem; margin-top: 3px; }
+.gauge { margin-top: 14px; }
+.gauge .bar { position: relative; display: flex; height: 10px; border-radius: 99px; overflow: hidden; gap: 2px; }
+.gauge .bar span { height: 100%; }
+.gauge .seg-u { background: var(--accent); opacity: .45; } .gauge .seg-n { background: var(--good); }
+.gauge .seg-o { background: var(--warn); } .gauge .seg-b { background: var(--bad); }
+.gauge .mark { position: absolute; top: -4px; width: 4px; height: 18px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--panel); transform: translateX(-50%); }
+.gauge .wrap { position: relative; }
+.gauge .ticks { position: relative; height: 16px; font-size: .66rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.gauge .ticks span { position: absolute; transform: translateX(-50%); top: 3px; }
+.gauge .names { display: flex; justify-content: space-between; font-size: .68rem; color: var(--ink-2); margin-top: 2px; gap: 6px; }
+.pf { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 14px; }
+.pf label.f input, .pf label.f select { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 7px 8px; font-size: .9rem; width: 100%; min-width: 0; height: 38px; }
+.wf { display: grid; grid-template-columns: 1.3fr 1fr 1fr auto; gap: 8px; align-items: end; margin-top: 12px; }
+.wf label.f input { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 7px 8px; font-size: .9rem; width: 100%; min-width: 0; height: 38px; }
+.wf .btn { height: 38px; }
+@media (max-width: 460px) { .wf { grid-template-columns: 1fr 1fr; } .wf .btn { grid-column: 1 / -1; justify-content: center; } }
+.w-chart { position: relative; margin-top: 14px; }
+.w-chart svg { display: block; width: 100%; height: 180px; overflow: visible; }
+.w-chart .grid line { stroke: var(--line); }
+.w-chart text { fill: var(--ink-2); font: 10px var(--body); font-variant-numeric: tabular-nums; }
+.w-chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.w-chart .area { fill: var(--accent); opacity: .08; }
+.w-chart .pt { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+.w-chart .goal { stroke: var(--good); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.w-chart .goal-l { fill: var(--good); }
+.w-chart .cross { stroke: var(--ink-2); stroke-dasharray: 2 3; }
+.w-list { margin-top: 10px; font-size: .82rem; }
+.w-list table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.w-list th, .w-list td { text-align: left; padding: 6px; border-bottom: 1px solid var(--line); }
+.w-list th { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); font-weight: 600; }
+.w-list .r { text-align: right; }
+.w-list .up { color: var(--bad); } .w-list .down { color: var(--good); }
+.w-list button { border: 0; background: transparent; color: var(--ink-2); padding: 2px 6px; border-radius: 6px; }
+.w-list button:hover { color: var(--bad); background: var(--bad-soft); }
 </style>
 </head>
 <body>
@@ -363,9 +406,9 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
       <p>Sổ tập toàn thân tại nhà · không dụng cụ · 30–45 phút · 4–5 buổi/tuần</p>
     </div>
     <div class="profile">
-      <span class="chip"><b>66 kg</b> · 1m67</span>
-      <span class="chip">BMI <b class="num">23,7</b></span>
-      <span class="chip">Đạm <b class="num">105–130 g</b>/ngày</span>
+      <button class="chip go" type="button" data-to="body" id="chipBody"></button>
+      <button class="chip go" type="button" data-to="body" id="chipBmi"></button>
+      <button class="chip go" type="button" data-to="body" id="chipProt"></button>
       <button class="chip" id="playToggle" type="button">⏸ Dừng hình</button>
     </div>
   </header>
@@ -374,6 +417,7 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
     <button type="button" data-go="tap" aria-current="true"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Tập luyện</button>
     <button type="button" data-go="diem"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>Tiến độ<span class="badge num" id="navBadge" hidden></span></button>
     <button type="button" data-go="lich"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Lịch tập</button>
+    <button type="button" data-go="body"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9.5a5 5 0 0 1 7 0L12 13z"/></svg>Cơ thể</button>
     <button type="button" data-go="luu"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Sao lưu</button>
   </nav>
 
@@ -463,6 +507,31 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
           <button class="btn" id="resetToday" type="button">Xoá checklist hôm nay</button>
         </div>
         <p class="note">HomeReps <span class="num" id="appVer"></span></p>
+      </section>
+
+      <section class="card on" data-pane="body" id="bodyCard">
+        <h2>Chỉ số cơ thể <small>tự tính từ hồ sơ</small></h2>
+        <div class="bm-tiles" id="bmTiles"></div>
+        <div class="gauge" id="bmGauge"></div>
+        <form class="pf" id="pfForm" novalidate>
+          <label class="f" for="pfHeight">Chiều cao (cm)<input id="pfHeight" type="number" inputmode="decimal" min="120" max="230" step="0.5"></label>
+          <label class="f" for="pfGoalW">Cân nặng mục tiêu (kg)<input id="pfGoalW" type="number" inputmode="decimal" min="30" max="250" step="0.1" placeholder="Không bắt buộc"></label>
+          <label class="f" for="pfGoal">Mục tiêu<select id="pfGoal"><option value="cut">Giảm mỡ</option><option value="keep">Giữ cân</option><option value="bulk">Tăng cơ</option></select></label>
+        </form>
+        <p class="note">BMI dùng thang của WHO cho người châu Á (thừa cân từ 23). BMI không phân biệt cơ và mỡ, nên chỉ xem như mốc tham khảo cùng với vòng eo và cảm nhận cơ thể.</p>
+      </section>
+
+      <section class="card on" data-pane="body" id="weightCard">
+        <h2>Nhật ký cân nặng <small id="wSummary"></small></h2>
+        <form class="wf" id="wForm" novalidate>
+          <label class="f" for="wDate">Ngày<input id="wDate" type="date"></label>
+          <label class="f" for="wKg">Cân nặng (kg)<input id="wKg" type="number" inputmode="decimal" min="30" max="250" step="0.1" required></label>
+          <label class="f" for="wWaist">Vòng eo (cm)<input id="wWaist" type="number" inputmode="decimal" min="40" max="200" step="0.5" placeholder="Tuỳ chọn"></label>
+          <button class="btn pri" type="submit">Lưu</button>
+        </form>
+        <div class="w-chart" id="wChart" role="img" aria-label="Biểu đồ cân nặng theo thời gian"></div>
+        <div class="w-list" id="wList"></div>
+        <p class="note">Cân vào buổi sáng, sau khi đi vệ sinh, trước khi ăn, 1–2 lần mỗi tuần để số liệu so sánh được với nhau.</p>
       </section>
     </aside>
   </div>
@@ -734,13 +803,14 @@ const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.get
 const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const todayKey = () => ymd(new Date());
 
-let state = { version: 4, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
+let state = { version: 5, body: { height: 167, weight: 66, goalWeight: null, goal: 'keep', log: [] }, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
 try {
   let raw = localStorage.getItem(KEY);
   // one-time move of data saved under the app's previous name
   if (!raw) { const old = LEGACY_KEYS.map(k => localStorage.getItem(k)).find(Boolean); if (old) { raw = old; localStorage.setItem(KEY, old); } }
   if (raw) state = Object.assign(state, JSON.parse(raw));
 } catch (e) {}
+state.body = Object.assign({ height: 167, weight: 66, goalWeight: null, goal: 'keep', log: [] }, state.body || {});
 function mondayKey(d) { return ymd(weekDates(d)[0]); }
 function defaultSchedule() { return state.schedule || DEFAULT_SCHEDULE; }
 // Session index planned for a date, honouring this week's overrides; undefined = no session.
@@ -1023,7 +1093,136 @@ function renderDayLog() {
     px.map((it, i) => `${esc(X[it[0]].vi)}: ${e.sets?.[i] || 0}/${it[1]} hiệp`).join('<br>');
 }
 
-function renderAll() { if (typeof renderBackup === 'function') try { renderBackup(); } catch (e) {} renderLevels(); renderDays(); renderSession(); renderWeek(); renderCal(); renderGcal(); if (typeof renderSched === 'function' && $('sch')) renderSched(); }
+/* ---------- Body metrics ---------- */
+const BMI_BANDS = [[0, 18.5, 'Thiếu cân', 'seg-u'], [18.5, 23, 'Bình thường', 'seg-n'], [23, 25, 'Thừa cân', 'seg-o'], [25, 99, 'Béo phì', 'seg-b']];
+const nf = (v, d = 1) => Number(v).toLocaleString('vi-VN', { maximumFractionDigits: d, minimumFractionDigits: 0 });
+function weightLog() { return (state.body.log || []).slice().sort((a, b) => a.date < b.date ? -1 : 1); }
+function currentWeight() { const l = weightLog(); return l.length ? l[l.length - 1].kg : state.body.weight; }
+function bmiOf(kg) { const h = state.body.height / 100; return h > 0 ? kg / (h * h) : 0; }
+function bmiBand(b) { return BMI_BANDS.find(x => b >= x[0] && b < x[1]) || BMI_BANDS[3]; }
+function proteinRange(kg) { const g = state.body.goal; const lo = 1.6, hi = g === 'cut' ? 2.2 : 2.0; return [Math.round(kg * lo / 5) * 5, Math.round(kg * hi / 5) * 5]; }
+function renderChips() {
+  const kg = currentWeight(), b = bmiOf(kg), [lo, hi] = proteinRange(kg), h = state.body.height;
+  $('chipBody').innerHTML = `<b>${nf(kg)} kg</b> · ${h >= 100 ? Math.floor(h / 100) + 'm' + String(Math.round(h % 100)).padStart(2, '0') : h + ' cm'}`;
+  $('chipBmi').innerHTML = `BMI <b class="num">${nf(b)}</b>`;
+  $('chipProt').innerHTML = `Đạm <b class="num">${lo}–${hi} g</b>/ngày`;
+}
+function renderBody() {
+  if (!$('bmTiles')) return;
+  const B = state.body, kg = currentWeight(), b = bmiOf(kg), band = bmiBand(b), [lo, hi] = proteinRange(kg);
+  const water = (kg * 0.035).toFixed(1).replace('.', ',');
+  const h = B.height / 100, normLo = 18.5 * h * h, normHi = 22.9 * h * h;
+  const toGoal = B.goalWeight ? kg - B.goalWeight : null;
+  const kcal = { cut: 'Ăn ít hơn nhu cầu khoảng 300–400 kcal/ngày', keep: 'Ăn đủ nhu cầu, giữ cân ổn định', bulk: 'Ăn dư khoảng 200–300 kcal/ngày' }[B.goal];
+  $('bmTiles').innerHTML = `
+    <div class="bm-tile"><div class="v num">${nf(b)}</div><div class="l">BMI</div><div class="d">${band[2]} · cân nặng bình thường với chiều cao này: ${nf(normLo, 0)}–${nf(normHi, 0)} kg</div></div>
+    <div class="bm-tile"><div class="v num">${nf(kg)}<small>kg</small></div><div class="l">Cân nặng hiện tại</div><div class="d">${toGoal === null ? 'Chưa đặt cân nặng mục tiêu' : Math.abs(toGoal) < .05 ? 'Đã đạt mục tiêu' : `Còn ${nf(Math.abs(toGoal))} kg để ${toGoal > 0 ? 'giảm' : 'tăng'} tới ${nf(B.goalWeight)} kg`}</div></div>
+    <div class="bm-tile"><div class="v num">${lo}–${hi}<small>g</small></div><div class="l">Đạm mỗi ngày</div><div class="d">${kcal}</div></div>
+    <div class="bm-tile"><div class="v num">${water}<small>lít</small></div><div class="l">Nước mỗi ngày</div><div class="d">Thêm khoảng 0,5 lít vào ngày tập</div></div>`;
+  const min = 15, max = 32, pos = v => (Math.min(max, Math.max(min, v)) - min) / (max - min) * 100;
+  $('bmGauge').innerHTML = `<div class="wrap"><div class="bar">${BMI_BANDS.map(x => `<span class="${x[3]}" style="width:${pos(Math.min(x[1], max)) - pos(Math.max(x[0], min))}%"></span>`).join('')}</div>
+    <span class="mark" style="left:${pos(b)}%" title="BMI ${nf(b)}"></span></div>
+    <div class="ticks">${[18.5, 23, 25].map(v => `<span style="left:${pos(v)}%">${nf(v)}</span>`).join('')}</div>
+    <div class="names">${BMI_BANDS.map(x => `<span${x === band ? ' style="color:var(--ink);font-weight:700"' : ''}>${x[2]}</span>`).join('')}</div>`;
+  if (document.activeElement !== $('pfHeight')) $('pfHeight').value = B.height;
+  if (document.activeElement !== $('pfGoalW')) $('pfGoalW').value = B.goalWeight ?? '';
+  $('pfGoal').value = B.goal;
+  if (!$('wDate').value) $('wDate').value = todayKey();
+  if (!$('wKg').value) $('wKg').placeholder = nf(kg);
+  renderWeights();
+  renderChips();
+}
+function renderWeights() {
+  const log = weightLog();
+  if (log.length >= 2) {
+    const d = log[log.length - 1].kg - log[0].kg;
+    $('wSummary').textContent = `${d === 0 ? 'Không đổi' : (d > 0 ? '+' : '−') + nf(Math.abs(d)) + ' kg'} từ ${log[0].date.split('-').reverse().slice(0, 2).join('/')}`;
+  } else $('wSummary').textContent = '';
+  drawWeightChart(log);
+  if (!log.length) { $('wList').innerHTML = '<p class="muted">Chưa có lần cân nào. Nhập cân nặng hôm nay ở trên để bắt đầu theo dõi.</p>'; return; }
+  const rows = log.slice().reverse();
+  $('wList').innerHTML = `<table><thead><tr><th>Ngày</th><th class="r">Cân nặng</th><th class="r">Thay đổi</th><th class="r">Eo</th><th></th></tr></thead><tbody>${rows.map((x, i) => {
+    const prev = rows[i + 1], diff = prev ? x.kg - prev.kg : 0;
+    return `<tr><td>${x.date.split('-').reverse().join('/')}</td><td class="r">${nf(x.kg)} kg</td><td class="r ${trendClass(diff)}">${prev ? (diff > 0 ? '+' : diff < 0 ? '−' : '±') + nf(Math.abs(diff)) : '–'}</td><td class="r">${x.waist ? nf(x.waist) + ' cm' : '–'}</td><td class="r"><button type="button" data-wdel="${x.date}" aria-label="Xoá lần cân ${x.date}">✕</button></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+// Colour a weight change by whether it moves toward the chosen goal.
+function trendClass(diff) {
+  const g = state.body.goal;
+  if (!diff || g === 'keep') return '';
+  return (g === 'cut' ? diff < 0 : diff > 0) ? 'down' : 'up';
+}
+function drawWeightChart(log) {
+  const box = $('wChart');
+  if (log.length < 2) { box.innerHTML = log.length ? '<p class="muted">Cân thêm ít nhất một lần nữa để xem biểu đồ.</p>' : ''; return; }
+  const W = Math.max(260, Math.round(box.clientWidth || 320)), H = 180, pl = 36, pr = 44, pt = 10, pb = 22, iw = W - pl - pr, ih = H - pt - pb;
+  const ts = log.map(x => parseYmd(x.date).getTime()), t0 = ts[0], t1 = Math.max(ts[ts.length - 1], t0 + 864e5);
+  const vals = log.map(x => x.kg).concat(state.body.goalWeight ? [state.body.goalWeight] : []);
+  let lo = Math.floor(Math.min(...vals) - 1), hi = Math.ceil(Math.max(...vals) + 1);
+  const step = hi - lo > 8 ? 2 : 1;
+  const X = t => pl + (t - t0) / (t1 - t0) * iw, Y = v => pt + (hi - v) / (hi - lo) * ih;
+  let g = '<g class="grid">';
+  for (let v = lo; v <= hi; v += step) g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}"></line><text x="${pl - 6}" y="${Y(v) + 3}" text-anchor="end">${v}</text>`;
+  g += '</g>';
+  const fmtD = t => { const d = new Date(t); return d.getDate() + '/' + (d.getMonth() + 1); };
+  const xt = [t0, t0 + (t1 - t0) / 2, t1].map(t => `<text x="${X(t)}" y="${H - 6}" text-anchor="middle">${fmtD(t)}</text>`).join('');
+  const pts = log.map((x, i) => [X(ts[i]), Y(x.kg)]);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const area = path + ` L${pts[pts.length - 1][0]},${pt + ih} L${pts[0][0]},${pt + ih} Z`;
+  const gw = state.body.goalWeight;
+  const goal = gw ? `<line class="goal" x1="${pl}" x2="${W - pr}" y1="${Y(gw)}" y2="${Y(gw)}"></line><text class="goal-l" x="${W - pr + 4}" y="${Y(gw) + 3}">Mục tiêu</text>` : '';
+  const last = pts[pts.length - 1];
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}${goal}<path class="area" d="${area}"></path><path class="line" d="${path}"></path>
+    ${log.length <= 40 ? pts.map(p => `<circle class="pt" cx="${p[0]}" cy="${p[1]}" r="4"></circle>`).join('') : ''}
+    <text x="${last[0] + 7}" y="${last[1] + 3}" style="fill:var(--ink);font-weight:700">${nf(log[log.length - 1].kg)}</text>
+    <line class="cross" x1="0" x2="0" y1="${pt}" y2="${pt + ih}" visibility="hidden"></line>${xt}
+    <rect x="${pl}" y="${pt}" width="${iw}" height="${ih}" fill="transparent" class="ov"></rect></svg><div class="ms-tip" hidden></div>`;
+  const svg = box.querySelector('svg'), tip = box.querySelector('.ms-tip'), cross = box.querySelector('.cross');
+  const move = ev => {
+    const r = svg.getBoundingClientRect(), mx = (ev.clientX - r.left) * W / r.width;
+    let bi = 0; pts.forEach((p, i) => { if (Math.abs(p[0] - mx) < Math.abs(pts[bi][0] - mx)) bi = i; });
+    const x = log[bi], prev = log[bi - 1];
+    cross.setAttribute('x1', pts[bi][0]); cross.setAttribute('x2', pts[bi][0]); cross.setAttribute('visibility', 'visible');
+    tip.innerHTML = `<b>${x.date.split('-').reverse().join('/')}</b> · ${nf(x.kg)} kg${prev ? ` (${x.kg - prev.kg >= 0 ? '+' : '−'}${nf(Math.abs(x.kg - prev.kg))})` : ''}${x.waist ? '<br>Vòng eo ' + nf(x.waist) + ' cm' : ''}`;
+    tip.hidden = false;
+    tip.style.left = Math.min(Math.max(pts[bi][0] / W * r.width, 70), r.width - 70) + 'px';
+    tip.style.top = (pts[bi][1] / H * r.height) + 'px';
+  };
+  const ov = box.querySelector('.ov');
+  ov.addEventListener('pointermove', move); ov.addEventListener('pointerdown', move);
+  ov.addEventListener('pointerleave', () => { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); });
+}
+$('pfForm').addEventListener('change', e => {
+  const B = state.body, v = parseFloat(String(e.target.value).replace(',', '.'));
+  if (e.target.id === 'pfHeight') { if (v >= 120 && v <= 230) B.height = v; else { toast('Chiều cao cần trong khoảng 120–230 cm.'); } }
+  if (e.target.id === 'pfGoalW') { if (e.target.value === '') B.goalWeight = null; else if (v >= 30 && v <= 250) B.goalWeight = v; else toast('Cân nặng mục tiêu cần trong khoảng 30–250 kg.'); }
+  if (e.target.id === 'pfGoal') B.goal = e.target.value;
+  save(); renderBody();
+});
+$('pfForm').addEventListener('submit', e => e.preventDefault());
+$('wForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const date = $('wDate').value, kg = parseFloat(String($('wKg').value).replace(',', '.')), waist = parseFloat(String($('wWaist').value).replace(',', '.'));
+  if (!okDate(date)) { toast('Chọn ngày cân.'); return; }
+  if (!(kg >= 30 && kg <= 250)) { toast('Cân nặng cần trong khoảng 30–250 kg.'); $('wKg').focus(); return; }
+  if (date > todayKey()) { toast('Không ghi được cho ngày trong tương lai.'); return; }
+  const log = state.body.log, i = log.findIndex(x => x.date === date), rec = { date, kg: Math.round(kg * 10) / 10 };
+  if (waist >= 40 && waist <= 200) rec.waist = Math.round(waist * 2) / 2;
+  if (i >= 0) log[i] = rec; else log.push(rec);
+  state.body.weight = currentWeight();
+  save(); $('wKg').value = ''; $('wWaist').value = ''; renderBody();
+  toast(i >= 0 ? 'Đã cập nhật lần cân ngày ' + date.split('-').reverse().slice(0, 2).join('/') : 'Đã lưu cân nặng ' + nf(rec.kg) + ' kg');
+});
+$('wList').addEventListener('click', e => {
+  const b = e.target.closest('[data-wdel]'); if (!b) return;
+  if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Xoá?'; setTimeout(() => { if (b.isConnected) { b.textContent = '✕'; delete b.dataset.armed; } }, 3000); return; }
+  state.body.log = state.body.log.filter(x => x.date !== b.dataset.wdel);
+  state.body.weight = currentWeight(); save(); renderBody(); toast('Đã xoá lần cân.');
+});
+document.querySelector('.profile').addEventListener('click', e => { const c = e.target.closest('[data-to]'); if (c && typeof showPane === 'function') { showPane(c.dataset.to); scrollTo(0, 0); } });
+addEventListener('resize', () => { if ($('weightCard') && $('weightCard').classList.contains('on')) drawWeightChart(weightLog()); });
+
+function renderAll() { renderBody(); if (typeof renderBackup === 'function') try { renderBackup(); } catch (e) {} renderLevels(); renderDays(); renderSession(); renderWeek(); renderCal(); renderGcal(); if (typeof renderSched === 'function' && $('sch')) renderSched(); }
 
 /* ---------- Animation loop ---------- */
 let plStage = null, plClock = 0;
@@ -1228,7 +1427,13 @@ async function offerFile(name, text, mime) {
 function buildMd() {
   const keys = Object.keys(state.log).sort();
   const done = keys.filter(k => isDone(state.log[k]));
-  let md = `# HomeReps: nhật ký tập luyện\n\n- Xuất ngày: ${todayKey()}\n- Cấp độ hiện tại: ${LEVELS[state.level].key}\n- Tổng buổi hoàn thành: ${done.length}\n- Chuỗi hiện tại: ${streak()} buổi\n- Tổng số hiệp: ${Object.values(state.log).reduce((s, e) => s + setsDone(e), 0)}\n\n## Chi tiết\n\n`;
+  let md = `# HomeReps: nhật ký tập luyện\n\n- Xuất ngày: ${todayKey()}\n- Cấp độ hiện tại: ${LEVELS[state.level].key}\n- Tổng buổi hoàn thành: ${done.length}\n- Chuỗi hiện tại: ${streak()} buổi\n- Tổng số hiệp: ${Object.values(state.log).reduce((s, e) => s + setsDone(e), 0)}\n\n`;
+  {
+    const kg = currentWeight(), b = bmiOf(kg), wl = weightLog();
+    md += `## Chỉ số cơ thể\n\n- Chiều cao: ${state.body.height} cm\n- Cân nặng hiện tại: ${nf(kg)} kg${state.body.goalWeight ? ' (mục tiêu ' + nf(state.body.goalWeight) + ' kg)' : ''}\n- BMI: ${nf(b)} (${bmiBand(b)[2]}, thang châu Á)\n\n`;
+    if (wl.length) md += '| Ngày | Cân nặng (kg) | Vòng eo (cm) |\n|---|---|---|\n' + wl.map(x => `| ${x.date.split('-').reverse().join('/')} | ${nf(x.kg)} | ${x.waist ? nf(x.waist) : ''} |`).join('\n') + '\n\n';
+  }
+  md += '## Chi tiết\n\n';
   if (!keys.length) md += '_Chưa có buổi nào._\n';
   keys.slice().reverse().forEach(k => {
     const e = state.log[k], dt = parseYmd(k);
@@ -1292,6 +1497,15 @@ function parseBackup(text) {
   if (d.weekPlan && typeof d.weekPlan === 'object') out.weekPlan = d.weekPlan;
   if (validCustom(d.custom)) out.custom = d.custom;
   if (d.lastExport) out.lastExport = d.lastExport;
+  if (d.body && typeof d.body === 'object') {
+    const b = d.body, body = {};
+    if (b.height >= 120 && b.height <= 230) body.height = b.height;
+    if (b.weight >= 30 && b.weight <= 250) body.weight = b.weight;
+    body.goalWeight = b.goalWeight >= 30 && b.goalWeight <= 250 ? b.goalWeight : null;
+    if (['cut', 'keep', 'bulk'].includes(b.goal)) body.goal = b.goal;
+    body.log = Array.isArray(b.log) ? b.log.filter(x => x && okDate(x.date) && x.kg >= 30 && x.kg <= 250).map(x => x.waist ? { date: x.date, kg: x.kg, waist: x.waist } : { date: x.date, kg: x.kg }) : [];
+    out.body = body;
+  }
   out.exportedAt = raw.exportedAt || null;
   return out;
 }
@@ -1307,7 +1521,7 @@ function showPreview(data, name) {
   $('impPreview').className = 'sch-sum';
   $('impPreview').innerHTML = `<b>${esc(name)}</b>${ex ? ` · xuất ngày ${ex.getDate()}/${ex.getMonth() + 1}/${ex.getFullYear()}` : ''}<br>
     ${keys.length} ngày dữ liệu${keys.length ? ` (${fmtK(keys[0])} → ${fmtK(keys[keys.length - 1])})` : ''}, ${done} buổi hoàn thành.
-    ${data.custom ? 'Có giáo án tuỳ chỉnh. ' : ''}${data.schedule || data.weekPlan ? 'Có lịch tập riêng. ' : ''}${data.level !== undefined ? 'Cấp độ: ' + LEVELS[data.level].key + '.' : ''}<br>
+    ${data.custom ? 'Có giáo án tuỳ chỉnh. ' : ''}${data.body && data.body.log && data.body.log.length ? 'Có ' + data.body.log.length + ' lần cân. ' : ''}${data.schedule || data.weekPlan ? 'Có lịch tập riêng. ' : ''}${data.level !== undefined ? 'Cấp độ: ' + LEVELS[data.level].key + '.' : ''}<br>
     <span class="muted">Trình duyệt này đang có ${cur} ngày dữ liệu.</span>
     <div class="row">
       <button class="btn pri sm" type="button" data-imp="merge">Gộp vào dữ liệu hiện có</button>
@@ -1325,15 +1539,21 @@ function applyImport(mode) {
   const data = pending; if (!data) return;
   try { localStorage.setItem(BACKUP_KEY, JSON.stringify(state)); } catch (e) {}
   const settings = ['level', 'intensity', 'goal', 'remind', 'rest', 'schedule', 'weekPlan', 'custom'];
+  const defaultBody = { height: 167, weight: 66, goalWeight: null, goal: 'keep', log: [] };
   if (mode === 'replace') {
     const fresh = { version: 4, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
     state = Object.assign(fresh, data, { lastExport: state.lastExport });
+    state.body = Object.assign({}, defaultBody, data.body || {});
   } else {
     Object.keys(data.log).forEach(k => {
       const inc = data.log[k], cur = state.log[k];
       if (!cur || isDone(inc) && !isDone(cur) || setsDone(inc) > setsDone(cur)) state.log[k] = inc;
     });
     settings.forEach(f => { if (data[f] !== undefined) state[f] = data[f]; });
+    if (data.body) {
+      const byDate = {}; (state.body.log || []).concat(data.body.log || []).forEach(x => { byDate[x.date] = x; });
+      state.body = Object.assign({}, state.body, data.body, { log: Object.values(byDate) });
+    }
   }
   delete state.exportedAt;
   const n = Object.keys(data.log).length;
@@ -1386,6 +1606,7 @@ function showPane(p) {
   try { localStorage.setItem('homereps-pane', p); } catch (e) {}
   if (p === 'tap') requestAnimationFrame(() => stages.forEach(sizeCanvas));
   if (p === 'diem') requestAnimationFrame(renderStats);
+  if (p === 'body') requestAnimationFrame(() => drawWeightChart(weightLog()));
 }
 $('mnav').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) { showPane(b.dataset.go); scrollTo(0, 0); } });
 mq.addEventListener('change', () => showPane(pane));
