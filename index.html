@@ -489,6 +489,7 @@ details.ms-table summary { cursor: pointer; color: var(--ink-2); font-weight: 60
         <div class="sch" id="sch"></div>
         <div class="sch-sum" id="schSum"></div>
         <div class="row" id="schActions"></div>
+        <label class="sw" for="autoShift"><input type="checkbox" id="autoShift"> Tự dời buổi bị lỡ sang ngày trống gần nhất trong tuần</label>
       </section>
 
       <section class="card on" data-pane="diem" id="statsCard">
@@ -1421,7 +1422,7 @@ $('restSkip').onclick = stopRest;
 $('restAdd').onclick = () => { restEnd += 15000; restTotal += 15; tickRest(); };
 
 let toastT;
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, Math.max(2600, msg.length * 60)); }
 
 /* ---------- Events ---------- */
 $('levels').addEventListener('click', e => {
@@ -1635,6 +1636,8 @@ function parseBackup(text) {
   if (d.rest && typeof d.rest === 'object') out.rest = d.rest;
   if (d.schedule && typeof d.schedule === 'object') out.schedule = d.schedule;
   if (d.weekPlan && typeof d.weekPlan === 'object') out.weekPlan = d.weekPlan;
+  if (typeof d.autoShift === 'boolean') out.autoShift = d.autoShift;
+  if (d.shifted && typeof d.shifted === 'object') out.shifted = d.shifted;
   if (validCustom(d.custom)) out.custom = d.custom;
   if (d.lastExport) out.lastExport = d.lastExport;
   if (d.body && typeof d.body === 'object') {
@@ -1678,7 +1681,7 @@ function readBackup(text, name) {
 function applyImport(mode) {
   const data = pending; if (!data) return;
   try { localStorage.setItem(BACKUP_KEY, JSON.stringify(state)); } catch (e) {}
-  const settings = ['level', 'intensity', 'goal', 'remind', 'rest', 'schedule', 'weekPlan', 'custom'];
+  const settings = ['level', 'intensity', 'goal', 'remind', 'rest', 'schedule', 'weekPlan', 'custom', 'autoShift', 'shifted'];
   const defaultBody = { height: 167, weight: 66, goalWeight: null, goal: 'keep', log: [] };
   if (mode === 'replace') {
     const fresh = { version: 4, level: 0, intensity: 1, goal: 4, weekPlan: {}, custom: {}, rest: {}, log: {}, remind: '18:30', updatedAt: 0 };
@@ -1801,8 +1804,38 @@ function reflowWeek() {
   save();
   return { short: need - n, moved };
 }
+// Moves sessions from past days this week that were never started onto the nearest free day (or an optional-session day).
+// Sessions that no longer fit in the week are simply skipped.
+function autoShift() {
+  if (state.autoShift === false) return [];
+  const wk = weekDates(), t = todayKey(), L = LV(state.level);
+  state.shifted = state.shifted || {};
+  const started = dt => { const e = state.log[ymd(dt)]; return !!e && (isDone(e) || setsDone(e) > 0); };
+  const missed = wk.filter(dt => ymd(dt) < t && !(ymd(dt) in state.shifted) && planFor(dt) !== undefined && !L.days[planFor(dt)]?.opt && !started(dt));
+  const moves = [];
+  missed.forEach(dt => {
+    const idx = planFor(dt), k = ymd(dt);
+    const covered = wk.some(x => ymd(x) >= t && planFor(x) === idx) || wk.some(x => started(x) && state.log[ymd(x)].day === idx);
+    if (covered) { state.shifted[k] = ''; return; }
+    const target = wk.find(x => ymd(x) >= t && !isBusy(x) && !started(x) && (planFor(x) === undefined || L.days[planFor(x)]?.opt));
+    if (target) weekOverride(true)[target.getDay()] = idx;
+    state.shifted[k] = target ? ymd(target) : 'none';
+    moves.push({ from: dt, to: target || null, idx });
+  });
+  const cutoff = ymd(new Date(Date.now() - 60 * 864e5));
+  Object.keys(state.shifted).forEach(k => { if (k < cutoff) delete state.shifted[k]; });
+  if (missed.length) save();
+  return moves;
+}
+function runAutoShift() {
+  const moves = autoShift(); if (!moves.length) return;
+  const L = LV(state.level), d = dt => `${WEEKDAYS[dt.getDay()]} ${dt.getDate()}/${dt.getMonth() + 1}`;
+  const msg = moves.map(m => m.to ? `${L.days[m.idx].n} (lỡ ${d(m.from)}) → ${d(m.to)}` : `${L.days[m.idx].n} (lỡ ${d(m.from)}): hết ngày trống, bỏ qua tuần này`).join('; ');
+  afterSched('Đã tự dời lịch: ' + msg);
+}
 function renderSched() {
   $('goalVal').textContent = weekGoal();
+  $('autoShift').checked = state.autoShift !== false;
   document.querySelectorAll('[data-sm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sm === schMode));
   const t = todayKey();
   if (schMode === 'def') {
@@ -1820,7 +1853,8 @@ function renderSched() {
     const k = ymd(dt), e = state.log[k], past = k < t, done = isDone(e);
     const cur = o && o[dt.getDay()] !== undefined ? o[dt.getDay()] : (defaultSchedule()[dt.getDay()] ?? OFF);
     const def = defaultSchedule()[dt.getDay()] ?? OFF;
-    const tag = done ? '<span class="tag ok">✓ Đã tập</span>' : (cur !== def && cur >= 0 ? '<span class="tag mv">Dời tới</span>' : '');
+    const sh = state.shifted && state.shifted[k];
+    const tag = done ? '<span class="tag ok">✓ Đã tập</span>' : sh && sh !== 'none' ? `<span class="tag mv">Đã dời → ${WEEKDAYS[parseYmd(sh).getDay()]}</span>` : sh === 'none' ? '<span class="tag mv">Bỏ qua</span>' : (cur !== def && cur >= 0 ? '<span class="tag mv">Dời tới</span>' : '');
     return `<div class="sch-row${k === t ? ' today' : ''}${cur === BUSY ? ' busy' : ''}${past ? ' past' : ''}">
       <span class="dn">${WEEKDAYS[dt.getDay()]}<small>${dt.getDate()}/${dt.getMonth() + 1}${k === t ? ' · nay' : ''}</small></span>
       <select data-wk="${dt.getDay()}" aria-label="Tuần này ${WEEKDAYS[dt.getDay()]}"${past || done ? ' disabled' : ''}>${sessionOptions(cur, true)}</select>${tag}</div>`;
@@ -1830,7 +1864,7 @@ function renderSched() {
   $('schSum').className = 'sch-sum ' + (sm.done >= sm.goal ? 'good' : ok ? '' : 'warn');
   $('schSum').textContent = sm.done >= sm.goal ? `Đã đạt mục tiêu tuần: ${sm.done}/${sm.goal} buổi.`
     : ok ? `Đã tập ${sm.done}, còn ${sm.left} buổi đã xếp. Đủ mục tiêu ${sm.goal} buổi nếu tập đúng lịch.`
-    : `Đã tập ${sm.done}, còn ${sm.left} buổi đã xếp. Thiếu ${sm.goal - sm.total} buổi so với mục tiêu. Bấm “Dồn lịch” để xếp vào ngày trống.`;
+    : `Đã tập ${sm.done}, còn ${sm.left} buổi đã xếp. Thiếu ${sm.goal - sm.total} buổi so với mục tiêu, không sao. Muốn bù thì bấm “Dồn lịch”.`;
   $('schActions').innerHTML = `<button class="btn pri sm" type="button" id="schReflow">⇄ Dồn lịch đủ ${sm.goal} buổi</button>` +
     (o ? `<button class="btn sm" type="button" id="schClear">Bỏ chỉnh tuần này</button>` : '');
 }
@@ -1867,6 +1901,11 @@ $('schedCard').addEventListener('change', e => {
     else afterSched();
   }
 });
+
+$('autoShift').addEventListener('change', e => { state.autoShift = e.target.checked; save(); if (e.target.checked) runAutoShift(); else renderSched(); });
+runAutoShift();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') runAutoShift(); });
+setInterval(runAutoShift, 30 * 60 * 1000);
 
 /* ---------- Program editor ---------- */
 var editMode = false;

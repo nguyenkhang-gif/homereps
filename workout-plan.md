@@ -13,6 +13,7 @@
 
 - Tập 4 buổi (T2, T3, T5, T6) là đủ. Thêm T7 nếu còn sức.
 - Bận vài ngày? Trong mục **Ngày tập** của `index.html`: chọn *Bận* cho ngày đó, app tự dồn các buổi còn thiếu sang ngày trống còn lại trong tuần để vẫn đủ mục tiêu (mặc định 4 buổi/tuần). Lịch mặc định cũng đổi được ở đó.
+- Lỡ buổi mà không điểm danh? App **tự dời** buổi đó sang ngày trống gần nhất còn lại trong tuần (hoặc thay buổi tuỳ chọn T7). Hết ngày trống thì bỏ qua, tuần đó thiếu buổi cũng không sao. Tắt được trong mục Ngày tập.
 - Mỗi buổi: **khởi động ~4′ → bài chính ~20′ → giãn cơ ~4′**.
 - Ký hiệu: `3 × 10` = làm 3 lần (3 vòng hoặc 3 lượt), mỗi lần 10 cái. `/bên` = mỗi bên trái/phải.
 - Mỗi buổi đều có đủ **chân, đẩy, lưng và core**. Không lặp cùng một bài ở hai ngày tập liền nhau, và hai bài liền nhau trong buổi không dùng chung nhóm cơ, để nhóm cơ vừa tập được nghỉ trong lúc tập nhóm khác.
